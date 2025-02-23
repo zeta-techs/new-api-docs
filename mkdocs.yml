@@ -10,7 +10,7 @@ repo_url: https://github.com/Calcium-Ion/new-api
 theme:
   name: material
   language: zh
-  # custom_dir: overrides
+  custom_dir: newapi/overrides
   features:
     - announce.dismiss
     - content.action.edit
@@ -62,6 +62,7 @@ theme:
 nav:
   - 首页: index.md
   - 快速开始:
+    - 项目介绍: introduction.md
     - 部署指南: deployment.md
     - 宝塔面板部署: bt-deployment.md
     - 基础配置: configuration.md
@@ -124,7 +125,7 @@ markdown_extensions:
       custom_checkbox: true
   - pymdownx.tilde
 
-copyright: Copyright &copy; 2024 New API Team
+copyright: Copyright &copy; 2024 Quantum Nous. All Rights Reserved. 量子智元公司 版权所有
 
 extra:
   social:
