@@ -7,20 +7,20 @@
   <link rel="stylesheet" href="{{ 'assets/stylesheets/custom.css' | url }}">
 {% endblock %}
 {% block announce %}
-  For updates follow <strong>@squidfunk</strong> on
-  <a rel="me" href="https://fosstodon.org/@squidfunk">
-    <span class="twemoji mastodon">
-      {% include ".icons/fontawesome/brands/mastodon.svg" %}
+  在 <a href="https://github.com/Calcium-Ion/new-api" target="_blank">
+    <span class="twemoji github">
+      {% include ".icons/fontawesome/brands/github.svg" %}
     </span>
-    <strong>Fosstodon</strong>
-  </a>
-  and
-  <a href="https://twitter.com/squidfunk">
-    <span class="twemoji twitter">
-      {% include ".icons/fontawesome/brands/x-twitter.svg" %}
+    <strong>GitHub</strong>
+  </a> 上关注我们的最新动态
+  或加入我们的
+  <a href="https://qm.qq.com/q/ahzeuWwjq8" target="_blank">
+    <span class="twemoji qq">
+      {% include ".icons/fontawesome/brands/qq.svg" %}
     </span>
-    <strong>X</strong> (Twitter)
+    <strong>QQ</strong>
   </a>
+  交流群
 {% endblock %}
 {% block scripts %}
   {{ super() }}
@@ -29,12 +29,14 @@
     {
       "@context": "https://schema.org",
       "@type": "WebSite",
-      "url": "https://squidfunk.github.io/mkdocs-material/",
+      "url": "https://github.com/Calcium-Ion/new-api",
+      "name": "New API - 新一代大模型网关与AI资产管理系统",
+      "description": "统一管理多种大模型API，支持OpenAI、Anthropic、Google等多家服务商，提供负载均衡、计费管理等功能",
       "potentialAction": {
         "@type": "SearchAction",
         "target": {
           "@type": "EntryPoint",
-          "urlTemplate": "https://squidfunk.github.io/mkdocs-material/?q={search_term_string}"
+          "urlTemplate": "https://github.com/Calcium-Ion/new-api?q={search_term_string}"
         },
         "query-input": "required name=search_term_string"
       }
