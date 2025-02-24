@@ -1,4 +1,4 @@
-# Anthropic 格式（Messages）
+# Anthropic 对话格式（Messages）
 
 > 官方文档请参阅：
 

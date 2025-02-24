@@ -1,4 +1,4 @@
-# OpenAI 格式嵌入接口
+# OpenAI 嵌入格式（Embeddings）
 
 > 官方文档请参阅：
 

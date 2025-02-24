@@ -82,9 +82,9 @@ nav:
         - OpenAI 格式: openai-embedding.md
       - ⚡ 实时对话（Realtime）:
         - OpenAI 格式: openai-realtime.md
-      - 🎨 绘图（Draw）:
-        - OpenAI 格式: openai-draw.md
-        - Midjourney Proxy 格式: midjourney-proxy-draw.md
+      - 🖼️ 图像（Image）:
+        - OpenAI 格式（Dall·E）: openai-image.md
+        - Midjourney Proxy 格式: midjourney-proxy-image.md
       - 🔊 音频（Audio）:
         - OpenAI 格式: openai-audio.md
       - 🎵 音乐（Music）:

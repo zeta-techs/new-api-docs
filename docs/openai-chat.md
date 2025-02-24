@@ -1,4 +1,4 @@
-# OpenAI 格式（Chat Completions）
+# OpenAI 对话格式（Chat Completions）
 
 > 官方文档请参阅：
 

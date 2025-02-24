@@ -1,4 +1,4 @@
-# Deepseek reasoning 格式（类Chat Completions）
+# Deepseek reasoning 对话格式（类Chat Completions）
 
 > 官方文档请参阅：
 
