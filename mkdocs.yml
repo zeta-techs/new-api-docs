@@ -80,6 +80,8 @@ nav:
         - Deepseek reasoning 格式（类Chat Completions）: deepseek-reasoning-chat.md
       - 🔤 嵌入（Embeddings）:
         - OpenAI 格式: openai-embedding.md
+      - 🔄 重排序（Rerank）:
+        - Jina AI 格式: jinaai-rerank.md
       - ⚡ 实时对话（Realtime）:
         - OpenAI 格式: openai-realtime.md
       - 🖼️ 图像（Image）:

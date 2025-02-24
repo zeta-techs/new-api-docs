@@ -5,9 +5,9 @@
     
     该项目分为两个版本，New API 都已经适配：
     
-    - 开源版[midjourney-proxy](https://github.com/novicezk/midjourney-proxy)
+    - 开源版 [midjourney-proxy](https://github.com/novicezk/midjourney-proxy)
     
-    - 付费版[midjourney-proxy-plus](https://github.com/litter-coder/midjourney-proxy-plus)
+    - 付费版 [midjourney-proxy-plus](https://github.com/litter-coder/midjourney-proxy-plus)
 
     这里非常感谢作者的贡献，让我们可以方便使用midjourney的强大功能，如果有时间，请给作者一个Star，如果有能力，建议支持作者的付费版本，该版本支持更多功能。
 
@@ -131,7 +131,7 @@ graph TD
 
 ```bash
 curl --location --request POST 'https://newapi地址/mj/submit/imagine' \
---header 'Authorization: Bearer ' \
+--header 'Authorization: Bearer $NEWAPI_API_KEY' \
 --header 'Accept: application/json' \
 --header 'Content-Type: application/json' \
 --data-raw '{
@@ -166,7 +166,7 @@ curl --location --request POST 'https://newapi地址/mj/submit/imagine' \
 
 ```bash
 curl --location --request POST 'https://newapi地址/mj/submit/blend' \
---header 'Authorization: Bearer ' \
+--header 'Authorization: Bearer $NEWAPI_API_KEY' \
 --header 'Accept: application/json' \
 --header 'Content-Type: application/json' \
 --data-raw '{
@@ -204,7 +204,7 @@ curl --location --request POST 'https://newapi地址/mj/submit/blend' \
 
 ```bash
 curl --location --request POST 'https://newapi地址/mj/submit/describe' \
---header 'Authorization: Bearer ' \
+--header 'Authorization: Bearer $NEWAPI_API_KEY' \
 --header 'Accept: application/json' \
 --header 'Content-Type: application/json' \
 --data-raw '{
@@ -238,7 +238,7 @@ curl --location --request POST 'https://newapi地址/mj/submit/describe' \
 
 ```bash
 curl --location --request POST 'https://newapi地址/mj/submit/modal' \
---header 'Authorization: Bearer ' \
+--header 'Authorization: Bearer $NEWAPI_API_KEY' \
 --header 'Accept: application/json' \
 --header 'Content-Type: application/json' \
 --data-raw '{
@@ -263,7 +263,7 @@ curl --location --request POST 'https://newapi地址/mj/submit/modal' \
 
 ```bash
 curl --location --request POST 'https://newapi地址/mj/insight-face/swap' \
---header 'Authorization: Bearer ' \
+--header 'Authorization: Bearer $NEWAPI_API_KEY' \
 --header 'Accept: application/json' \
 --header 'Content-Type: application/json' \
 --data-raw '{
@@ -286,7 +286,7 @@ curl --location --request POST 'https://newapi地址/mj/insight-face/swap' \
 
 ```bash
 curl --location --request POST 'https://newapi地址/mj/submit/action' \
---header 'Authorization: Bearer ' \
+--header 'Authorization: Bearer $NEWAPI_API_KEY' \
 --header 'Accept: application/json' \
 --header 'Content-Type: application/json' \
 --data-raw '{
@@ -321,7 +321,7 @@ curl --location --request POST 'https://newapi地址/mj/submit/action' \
 
 ```bash
 curl --location --request POST 'https://newapi地址/mj/submit/upload-discord-images' \
---header 'Authorization: Bearer ' \
+--header 'Authorization: Bearer $NEWAPI_API_KEY' \
 --header 'Accept: application/json' \
 --header 'Content-Type: application/json' \
 --data-raw '{
@@ -351,7 +351,7 @@ curl --location --request POST 'https://newapi地址/mj/submit/upload-discord-im
 ```bash
 curl --location --request POST 'https://newapi地址/mj/task/list-by-condition' \
 --header 'Accept: application/json' \
---header 'Authorization: Bearer ' \
+--header 'Authorization: Bearer $NEWAPI_API_KEY' \
 --header 'Content-Type: application/json' \
 --data-raw '{
   "ids": []
@@ -395,7 +395,7 @@ curl --location --request POST 'https://newapi地址/mj/task/list-by-condition' 
 ```bash
 curl --location --request GET 'https://newapi地址/mj/task/{id}/fetch' \
 --header 'Accept: application/json' \
---header 'Authorization: Bearer ' \
+--header 'Authorization: Bearer $NEWAPI_API_KEY' \
 --header 'Content-Type: application/json'
 ```
 
@@ -434,7 +434,7 @@ curl --location --request GET 'https://newapi地址/mj/task/{id}/fetch' \
 ```bash
 curl --location --request GET 'https://newapi地址/mj/task/{id}/image-seed' \
 --header 'Accept: application/json' \
---header 'Authorization: Bearer ' \
+--header 'Authorization: Bearer $NEWAPI_API_KEY' \
 --header 'Content-Type: application/json'
 ```
 
@@ -527,7 +527,7 @@ GET /mj/task/{id}/image-seed
 在请求头中包含以下内容进行 API 密钥认证：
 
 ```
-Authorization: Bearer $OPENAI_API_KEY
+Authorization: Bearer $NEWAPI_API_KEY$OPENAI_API_KEY
 ```
 
 其中 `$OPENAI_API_KEY` 是您的 API 密钥。

@@ -16,7 +16,7 @@
 # 基础图片生成
 curl https://newapi地址/v1/images/generations \
   -H "Content-Type: application/json" \
-  -H "Authorization: Bearer $OPENAI_API_KEY" \
+  -H "Authorization: Bearer $NEWAPI_API_KEY" \
   -d '{
     "model": "dall-e-3",
     "prompt": "一只可爱的小海獭",
@@ -27,7 +27,7 @@ curl https://newapi地址/v1/images/generations \
 # 高质量图片生成
 curl https://newapi地址/v1/images/generations \
   -H "Content-Type: application/json" \
-  -H "Authorization: Bearer $OPENAI_API_KEY" \
+  -H "Authorization: Bearer $NEWAPI_API_KEY" \
   -d '{
     "model": "dall-e-3",
     "prompt": "一只可爱的小海獭",
@@ -39,7 +39,7 @@ curl https://newapi地址/v1/images/generations \
 # 使用 base64 返回格式
 curl https://newapi地址/v1/images/generations \
   -H "Content-Type: application/json" \
-  -H "Authorization: Bearer $OPENAI_API_KEY" \
+  -H "Authorization: Bearer $NEWAPI_API_KEY" \
   -d '{
     "model": "dall-e-3",
     "prompt": "一只可爱的小海獭",
@@ -65,7 +65,7 @@ curl https://newapi地址/v1/images/generations \
 
 ```bash
 curl https://newapi地址/v1/images/edits \
-  -H "Authorization: Bearer $OPENAI_API_KEY" \
+  -H "Authorization: Bearer $NEWAPI_API_KEY" \
   -F image="@otter.png" \
   -F mask="@mask.png" \
   -F prompt="一只戴着贝雷帽的可爱小海獭" \
@@ -93,7 +93,7 @@ curl https://newapi地址/v1/images/edits \
 
 ```bash
 curl https://newapi地址/v1/images/variations \
-  -H "Authorization: Bearer $OPENAI_API_KEY" \
+  -H "Authorization: Bearer $NEWAPI_API_KEY" \
   -F image="@otter.png" \
   -F n=2 \
   -F size="1024x1024"
@@ -145,7 +145,7 @@ POST /v1/images/variations
 在请求头中包含以下内容进行 API 密钥认证：
 
 ```
-Authorization: Bearer $OPENAI_API_KEY
+Authorization: Bearer $NEWAPI_API_KEY
 ```
 
 其中 `$OPENAI_API_KEY` 是您的 API 密钥。

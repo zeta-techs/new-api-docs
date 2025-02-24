@@ -23,7 +23,7 @@
 ```bash
 curl https://newapi地址/v1/embeddings \
   -H "Content-Type: application/json" \
-  -H "Authorization: Bearer $OPENAI_API_KEY" \
+  -H "Authorization: Bearer $NEWAPI_API_KEY" \
   -d '{
     "input": "The food was delicious and the waiter...",
     "model": "text-embedding-ada-002",
@@ -61,7 +61,7 @@ curl https://newapi地址/v1/embeddings \
 ```bash
 curl https://newapi地址/v1/embeddings \
   -H "Content-Type: application/json" \
-  -H "Authorization: Bearer $OPENAI_API_KEY" \
+  -H "Authorization: Bearer $NEWAPI_API_KEY" \
   -d '{
     "input": ["The food was delicious", "The waiter was friendly"],
     "model": "text-embedding-ada-002",
@@ -115,7 +115,7 @@ POST /v1/embeddings
 在请求头中包含以下内容进行 API 密钥认证：
 
 ```
-Authorization: Bearer $OPENAI_API_KEY
+Authorization: Bearer $NEWAPI_API_KEY
 ```
 
 其中 `$OPENAI_API_KEY` 是您的 API 密钥。
