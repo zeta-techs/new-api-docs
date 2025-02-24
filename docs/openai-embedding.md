@@ -9,9 +9,12 @@
 获取给定输入文本的向量表示，这些向量可以被机器学习模型和算法轻松使用。相关指南请参阅 [Embeddings Guide](https://platform.openai.com/docs/guides/embeddings)。
 
 需要注意的是:
+
 - 某些模型可能对输入的总 token 数有限制
+
 - 您可以使用[示例 Python 代码](https://github.com/openai/openai-cookbook/blob/main/examples/How_to_count_tokens_with_tiktoken.ipynb)来计算 token 数量
-- text-embedding-ada-002 模型的输出向量维度为 1536
+
+- 例如：text-embedding-ada-002 模型的输出向量维度为 1536
 
 ## 💡 请求示例
 
