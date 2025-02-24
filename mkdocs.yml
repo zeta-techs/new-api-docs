@@ -61,19 +61,36 @@ theme:
 
 nav:
   - 首页: index.md
-  - 快速开始:
+  # 负责系统部署和配置说明
+  - 开始: 
     - 项目介绍: introduction.md
     - 部署指南: deployment.md
     - 宝塔面板部署: bt-deployment.md
     - 基础配置: configuration.md
-  - 核心功能:
+  # 负责用户系统使用说明
+  - 用户指南:
     - 模型支持: models.md
     - 重试机制: retry.md
-  - API集成:
-    - API使用示例: api-examples.md
-    - Midjourney接入: midjourney.md
-    - Suno接入: suno.md
-    - Rerank接入: rerank.md
+  # 负责接口文档说明
+  - 接口文档:
+    - 中继接口:
+      - 💬 聊天（Chat）:
+        - OpenAI 格式: openai-chat.md
+        - Anthropic Claude 格式: anthropic-claude-chat.md
+      - 🔤 嵌入（Embedding）:
+        - OpenAI 格式: openai-embedding.md
+      - ⚡ 实时对话（Realtime）:
+        - OpenAI 格式: openai-realtime.md
+      - 🎨 绘图（Draw）:
+        - OpenAI 格式: openai-draw.md
+        - Midjourney Proxy 格式: midjourney-proxy-draw.md
+      - 🔊 音频（Audio）:
+        - OpenAI 格式: openai-audio.md
+      - 🎵 音乐（Music）:
+        - Suno API 格式: suno-music.md
+    - 前端接口:
+      - 敬请期待: coming-soon.md
+  # 负责其他说明
   - 帮助支持:
     - 常见问题: faq.md
     - 相关项目: related-projects.md
