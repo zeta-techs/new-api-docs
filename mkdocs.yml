@@ -78,7 +78,7 @@ nav:
         - OpenAI 格式（Chat Completions）: openai-chat.md
         - Anthropic 格式（Messages）: anthropic-chat.md
         - Deepseek reasoning 格式（类Chat Completions）: deepseek-reasoning-chat.md
-      - 🔤 嵌入（Embedding）:
+      - 🔤 嵌入（Embeddings）:
         - OpenAI 格式: openai-embedding.md
       - ⚡ 实时对话（Realtime）:
         - OpenAI 格式: openai-realtime.md
@@ -143,7 +143,7 @@ markdown_extensions:
       custom_checkbox: true
   - pymdownx.tilde
 
-copyright: Copyright &copy; 2024 Quantum Nous. All Rights Reserved. 量子智元公司 版权所有
+copyright: Copyright &copy; 2025 Quantum Nous. All Rights Reserved. 量子智元公司 版权所有
 
 extra:
   social:

@@ -2,7 +2,7 @@
 
 > 官方文档请参阅：
 
-> [Deepseek reasoning](https://api-docs.deepseek.com/zh-cn/guides/reasoning_model)
+> [推理模型 (deepseek-reasoner)](https://api-docs.deepseek.com/zh-cn/guides/reasoning_model)
 
 ## 📝 简介
 
@@ -210,7 +210,11 @@ Authorization: Bearer $DEEPSEEK_API_KEY
 
 ## 📝 上下文拼接说明
 
-在每一轮对话过程中,模型会输出思维链内容（reasoning_content）和最终回答（content）。在下一轮对话中,之前轮输出的思维链内容不会被拼接到上下文中。
+在每一轮对话过程中，模型会输出思维链内容（reasoning_content）和最终回答（content）。在下一轮对话中，之前轮输出的思维链内容不会被拼接到上下文中，如下图所示：
+
+![Deepseek reasoning 上下文拼接示意图](assets/deepseek_r1_multiround_example_cn.png)
+
+> 请注意，如果您在输入的 messages 序列中，传入了reasoning_content，API 会返回 400 错误。因此，请删除 API 响应中的 reasoning_content 字段，再发起 API 请求，方法如下方使用示例所示。
 
 使用示例:
 
