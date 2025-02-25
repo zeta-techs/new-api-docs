@@ -64,13 +64,9 @@ nav:
   # 负责系统部署和配置说明
   - 部署与配置: 
     - 项目介绍: introduction.md
-    - 部署指南: deployment.md
-    - 宝塔面板部署: bt-deployment.md
-    - 基础配置: configuration.md
   # 负责用户系统使用说明
   - 用户指南:
-    - 模型支持: models.md
-    - 重试机制: retry.md
+    - 敬请期待: coming-soon.md
   # 负责接口文档说明
   - 接口文档:
     - 中继接口:
@@ -95,9 +91,7 @@ nav:
       - 敬请期待: coming-soon.md
   # 负责其他说明
   - 帮助支持:
-    - 常见问题: faq.md
-    - 相关项目: related-projects.md
-    - 交流社区: community.md
+    - 敬请期待: coming-soon.md
 
 plugins:
   - blog
