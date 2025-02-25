@@ -67,6 +67,7 @@ nav:
     - ✨ 特性说明: wiki/features-introduction.md
     - 🏗️ 技术架构: wiki/technical-architecture.md
     - 📝 更新日志: wiki/changelog.md
+    - 🤖 模型支持: wiki/supported-models.md
     - 🗺️ 路线图:
       - 2025年: wiki/2025-roadmap.md
     - 🙏 特别鸣谢: wiki/special-thanks.md
