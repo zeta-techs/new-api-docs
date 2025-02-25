@@ -1,9 +1,19 @@
 # OpenAI 实时对话接口
 
+> 官方文档请参阅：
+
+> [OpenAI Realtime WebRTC](https://platform.openai.com/docs/guides/realtime-webrtc)
+
+> [OpenAI Realtime WebSocket](https://platform.openai.com/docs/guides/realtime-websocket)
+
 ## 📝 概述
 
 ### 简介
-WebRTC 是一组用于构建实时应用程序的标准接口。OpenAI Realtime API 支持通过 WebRTC 对等连接与实时模型进行交互。
+OpenAI Realtime API 提供两种连接方式：
+
+1. WebRTC - 适用于浏览器和移动客户端的实时音视频交互
+
+2. WebSocket - 适用于服务器到服务器的应用程序集成
 
 ### 使用场景
 - 实时语音对话
@@ -11,6 +21,7 @@ WebRTC 是一组用于构建实时应用程序的标准接口。OpenAI Realtime 
 - 实时翻译
 - 语音转写
 - 实时代码生成
+- 服务器端实时集成
 
 ### 主要特性
 - 双向音频流传输
@@ -18,6 +29,7 @@ WebRTC 是一组用于构建实时应用程序的标准接口。OpenAI Realtime 
 - 函数调用支持
 - 自动语音检测(VAD)
 - 音频转写功能
+- WebSocket 服务器端集成
 
 ## 🔐 认证与安全
 
@@ -27,7 +39,7 @@ WebRTC 是一组用于构建实时应用程序的标准接口。OpenAI Realtime 
 
 ### 临时令牌
 - 有效期: 1分钟
-- 使用限制: 单个 WebRTC 连接
+- 使用限制: 单个连接
 - 获取方式: 通过服务器端 API 创建
 
 ```http
@@ -43,18 +55,25 @@ Authorization: Bearer $NEW_API_KEY
 
 ### 安全建议
 - 永远不要在客户端暴露标准 API 密钥
-- 使用 HTTPS 进行通信
+- 使用 HTTPS/WSS 进行通信
 - 实现适当的访问控制
 - 监控异常活动
 
 ## 🔌 连接建立
 
-### 基础信息
+### WebRTC 连接
 - URL: `https://newapi地址/v1/realtime`
 - 查询参数: `model`
 - 请求头: 
   - `Authorization: Bearer EPHEMERAL_KEY`
   - `Content-Type: application/sdp`
+
+### WebSocket 连接
+- URL: `wss://newapi地址/v1/realtime`
+- 查询参数: `model`
+- 请求头:
+  - `Authorization: Bearer YOUR_API_KEY`
+  - `OpenAI-Beta: realtime=v1`
 
 ### 连接流程
 
@@ -64,20 +83,25 @@ sequenceDiagram
     participant Server
     participant OpenAI
     
-    Client->>Server: 请求临时令牌
-    Server->>OpenAI: 创建会话
-    OpenAI-->>Server: 返回临时令牌
-    Server-->>Client: 返回临时令牌
-    
-    Client->>OpenAI: 创建 WebRTC offer
-    OpenAI-->>Client: 返回 answer
-    
-    Note over Client,OpenAI: 建立 WebRTC 连接
-    
-    Client->>OpenAI: 创建数据通道
-    OpenAI-->>Client: 确认数据通道
-    
-    Note over Client,OpenAI: 开始实时对话
+    alt WebRTC 连接
+        Client->>Server: 请求临时令牌
+        Server->>OpenAI: 创建会话
+        OpenAI-->>Server: 返回临时令牌
+        Server-->>Client: 返回临时令牌
+        
+        Client->>OpenAI: 创建 WebRTC offer
+        OpenAI-->>Client: 返回 answer
+        
+        Note over Client,OpenAI: 建立 WebRTC 连接
+        
+        Client->>OpenAI: 创建数据通道
+        OpenAI-->>Client: 确认数据通道
+    else WebSocket 连接
+        Server->>OpenAI: 建立 WebSocket 连接
+        OpenAI-->>Server: 确认连接
+        
+        Note over Server,OpenAI: 开始实时对话
+    end
 ```
 
 ### 数据通道
@@ -138,191 +162,244 @@ sequenceDiagram
 
 ## 🚀 代码示例
 
-### 客户端实现
+### WebRTC 连接示例
+
+#### 客户端实现 (浏览器)
 ```javascript
-class RealtimeClient {
-  constructor(serverUrl) {
-    this.serverUrl = serverUrl;
-    this.pc = null;
-    this.dc = null;
-    this.audioEl = null;
-  }
+async function init() {
+  // 从服务器获取临时密钥 - 参见下方服务器代码
+  const tokenResponse = await fetch("/session");
+  const data = await tokenResponse.json();
+  const EPHEMERAL_KEY = data.client_secret.value;
 
-  async init() {
-    // 获取临时令牌
-    const token = await this.getEphemeralToken();
-    
-    // 创建 WebRTC 连接
-    this.pc = new RTCPeerConnection();
-    
-    // 设置音频播放
-    this.setupAudio();
-    
-    // 设置数据通道
-    this.setupDataChannel();
-    
-    // 建立连接
-    await this.connect(token);
-  }
+  // 创建对等连接
+  const pc = new RTCPeerConnection();
 
-  async getEphemeralToken() {
-    const response = await fetch(`${this.serverUrl}/session`);
-    const data = await response.json();
-    return data.client_secret.value;
-  }
+  // 设置播放模型返回的远程音频
+  const audioEl = document.createElement("audio");
+  audioEl.autoplay = true;
+  pc.ontrack = e => audioEl.srcObject = e.streams[0];
 
-  async setupAudio() {
-    // 创建音频元素
-    this.audioEl = document.createElement('audio');
-    this.audioEl.autoplay = true;
-    
-    // 处理远程音频流
-    this.pc.ontrack = (e) => {
-      this.audioEl.srcObject = e.streams[0];
-    };
-    
-    // 添加本地音频轨道
-    const stream = await navigator.mediaDevices.getUserMedia({
-      audio: true
-    });
-    this.pc.addTrack(stream.getTracks()[0]);
-  }
+  // 添加浏览器麦克风输入的本地音频轨道
+  const ms = await navigator.mediaDevices.getUserMedia({
+    audio: true
+  });
+  pc.addTrack(ms.getTracks()[0]);
 
-  setupDataChannel() {
-    this.dc = this.pc.createDataChannel('oai-events');
-    
-    this.dc.onopen = () => {
-      console.log('Data channel opened');
-    };
-    
-    this.dc.onmessage = (e) => {
-      const event = JSON.parse(e.data);
-      this.handleEvent(event);
-    };
-    
-    this.dc.onerror = (e) => {
-      console.error('Data channel error:', e);
-    };
-  }
+  // 设置用于发送和接收事件的数据通道
+  const dc = pc.createDataChannel("oai-events");
+  dc.addEventListener("message", (e) => {
+    // 这里接收实时服务器事件！
+    console.log(e);
+  });
 
-  async connect(token) {
-    // 创建 offer
-    const offer = await this.pc.createOffer();
-    await this.pc.setLocalDescription(offer);
+  // 使用会话描述协议(SDP)启动会话
+  const offer = await pc.createOffer();
+  await pc.setLocalDescription(offer);
 
-    // 发送 offer 并获取 answer
-    const response = await fetch(
-      'https://newapi地址/v1/realtime?model=gpt-4o-realtime-preview-2024-12-17',
-      {
-        method: 'POST',
-        body: offer.sdp,
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/sdp'
-        }
-      }
-    );
+  const baseUrl = "https://newapi地址/v1/realtime";
+  const model = "gpt-4o-realtime-preview-2024-12-17";
+  const sdpResponse = await fetch(`${baseUrl}?model=${model}`, {
+    method: "POST",
+    body: offer.sdp,
+    headers: {
+      Authorization: `Bearer ${EPHEMERAL_KEY}`,
+      "Content-Type": "application/sdp"
+    },
+  });
 
-    // 设置远程描述
-    const answer = {
-      type: 'answer',
-      sdp: await response.text()
-    };
-    await this.pc.setRemoteDescription(answer);
-  }
-
-  handleEvent(event) {
-    switch(event.type) {
-      case 'response.text.delta':
-        // 处理文本增量
-        break;
-      case 'response.audio.delta':
-        // 处理音频增量
-        break;
-      case 'error':
-        // 处理错误
-        break;
-      default:
-        console.log('Received event:', event);
-    }
-  }
-
-  sendEvent(event) {
-    if(this.dc && this.dc.readyState === 'open') {
-      this.dc.send(JSON.stringify(event));
-    }
-  }
-
-  disconnect() {
-    if(this.pc) {
-      this.pc.close();
-    }
-    if(this.dc) {
-      this.dc.close();
-    }
-    if(this.audioEl) {
-      this.audioEl.srcObject = null;
-    }
-  }
+  const answer = {
+    type: "answer",
+    sdp: await sdpResponse.text(),
+  };
+  await pc.setRemoteDescription(answer);
 }
+
+init();
 ```
 
-### 服务器端实现
+#### 服务器端实现 (Node.js)
 ```javascript
-import express from 'express';
-import cors from 'cors';
+import express from "express";
 
 const app = express();
-app.use(cors());
 
-class SessionManager {
-  constructor(apiKey) {
-    this.apiKey = apiKey;
+// 创建一个端点用于生成临时令牌
+// 该端点与上面的客户端代码配合使用
+app.get("/session", async (req, res) => {
+  const r = await fetch("https://newapi地址/v1/realtime/sessions", {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      model: "gpt-4o-realtime-preview-2024-12-17",
+      voice: "verse",
+    }),
+  });
+  const data = await r.json();
+
+  // 将从OpenAI REST API收到的JSON发送回客户端
+  res.send(data);
+});
+
+app.listen(3000);
+```
+
+#### WebRTC 事件收发示例
+```javascript
+// 从对等连接创建数据通道
+const dc = pc.createDataChannel("oai-events");
+
+// 监听数据通道上的服务器事件
+// 事件数据需要从JSON字符串解析
+dc.addEventListener("message", (e) => {
+  const realtimeEvent = JSON.parse(e.data);
+  console.log(realtimeEvent);
+});
+
+// 发送客户端事件：将有效的客户端事件序列化为
+// JSON，并通过数据通道发送
+const responseCreate = {
+  type: "response.create",
+  response: {
+    modalities: ["text"],
+    instructions: "Write a haiku about code",
+  },
+};
+dc.send(JSON.stringify(responseCreate));
+```
+
+### WebSocket 连接示例
+
+#### Node.js (ws模块)
+```javascript
+import WebSocket from "ws";
+
+const url = "wss://api.openai.com/v1/realtime?model=gpt-4o-realtime-preview-2024-12-17";
+const ws = new WebSocket(url, {
+  headers: {
+    "Authorization": "Bearer " + process.env.OPENAI_API_KEY,
+    "OpenAI-Beta": "realtime=v1",
+  },
+});
+
+ws.on("open", function open() {
+  console.log("Connected to server.");
+});
+
+ws.on("message", function incoming(message) {
+  console.log(JSON.parse(message.toString()));
+});
+```
+
+#### Python (websocket-client)
+```python
+# 需要安装 websocket-client 库:
+# pip install websocket-client
+
+import os
+import json
+import websocket
+
+OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
+
+url = "wss://api.openai.com/v1/realtime?model=gpt-4o-realtime-preview-2024-12-17"
+headers = [
+    "Authorization: Bearer " + OPENAI_API_KEY,
+    "OpenAI-Beta: realtime=v1"
+]
+
+def on_open(ws):
+    print("Connected to server.")
+
+def on_message(ws, message):
+    data = json.loads(message)
+    print("Received event:", json.dumps(data, indent=2))
+
+ws = websocket.WebSocketApp(
+    url,
+    header=headers,
+    on_open=on_open,
+    on_message=on_message,
+)
+
+ws.run_forever()
+```
+
+#### 浏览器 (标准WebSocket)
+```javascript
+/*
+注意：在浏览器等客户端环境中，我们建议使用WebRTC。
+但在Deno和Cloudflare Workers等类浏览器环境中，
+也可以使用标准WebSocket接口。
+*/
+
+const ws = new WebSocket(
+  "wss://api.openai.com/v1/realtime?model=gpt-4o-realtime-preview-2024-12-17",
+  [
+    "realtime",
+    // 认证
+    "openai-insecure-api-key." + OPENAI_API_KEY, 
+    // 可选
+    "openai-organization." + OPENAI_ORG_ID,
+    "openai-project." + OPENAI_PROJECT_ID,
+    // Beta协议，必需
+    "openai-beta.realtime-v1"
+  ]
+);
+
+ws.on("open", function open() {
+  console.log("Connected to server.");
+});
+
+ws.on("message", function incoming(message) {
+  console.log(message.data);
+});
+```
+
+#### 消息收发示例
+
+##### Node.js/浏览器
+```javascript
+// 接收服务器事件
+ws.on("message", function incoming(message) {
+  // 需要从JSON解析消息数据
+  const serverEvent = JSON.parse(message.data)
+  console.log(serverEvent);
+});
+
+// 发送事件，创建符合客户端事件格式的JSON数据结构
+const event = {
+  type: "response.create",
+  response: {
+    modalities: ["audio", "text"],
+    instructions: "Give me a haiku about code.",
   }
+};
+ws.send(JSON.stringify(event));
+```
 
-  async createSession() {
-    try {
-      const response = await fetch('https://newapi地址/v1/realtime/sessions', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${this.apiKey}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          model: 'gpt-4o-realtime-preview-2024-12-17',
-          voice: 'verse'
-        })
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      return await response.json();
-    } catch (error) {
-      console.error('Error creating session:', error);
-      throw error;
+##### Python
+```python
+# 发送客户端事件，将字典序列化为JSON
+def on_open(ws):
+    print("Connected to server.")
+    
+    event = {
+        "type": "response.create",
+        "response": {
+            "modalities": ["text"],
+            "instructions": "Please assist the user."
+        }
     }
-  }
-}
+    ws.send(json.dumps(event))
 
-const sessionManager = new SessionManager(process.env.OPENAI_API_KEY);
-
-app.get('/session', async (req, res) => {
-  try {
-    const session = await sessionManager.createSession();
-    res.json(session);
-  } catch (error) {
-    res.status(500).json({
-      error: 'Failed to create session',
-      message: error.message
-    });
-  }
-});
-
-app.listen(3000, () => {
-  console.log('Server running on port 3000');
-});
+# 接收消息需要从JSON解析消息负载
+def on_message(ws, message):
+    data = json.loads(message)
+    print("Received event:", json.dumps(data, indent=2))
 ```
 
 ## ⚠️ 错误处理
