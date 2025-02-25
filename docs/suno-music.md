@@ -23,7 +23,7 @@ Suno Music API 提供了一系列音乐生成和处理的功能，包括:
 
 ## 💡 请求示例
 
-### 生成歌曲
+### 生成歌曲 ✅
 
 ```bash
 curl --location 'https://newapi地址/suno/submit/music' \
@@ -47,7 +47,7 @@ curl --location 'https://newapi地址/suno/submit/music' \
 }
 ```
 
-### 生成歌词
+### 生成歌词 ✅
 
 ```bash
 curl --location 'https://newapi地址/suno/submit/lyrics' \
@@ -68,7 +68,7 @@ curl --location 'https://newapi地址/suno/submit/lyrics' \
 }
 ```
 
-### 上传音频
+### 上传音频 ❌
 
 ```bash
 curl --location 'https://newapi地址/suno/uploads/audio-url' \
@@ -89,7 +89,7 @@ curl --location 'https://newapi地址/suno/uploads/audio-url' \
 }  
 ```
 
-### 歌曲拼接
+### 歌曲拼接 ❌
 
 ```bash
 curl --location 'https://newapi地址/suno/submit/concat' \
@@ -111,7 +111,7 @@ curl --location 'https://newapi地址/suno/submit/concat' \
 }
 ```
 
-### 查询任务状态
+### 查询任务状态 ✅
 
 #### 批量查询
 

@@ -69,6 +69,7 @@ nav:
     - 敬请期待: coming-soon.md
   # 负责接口文档说明
   - 接口文档:
+    - 接口介绍: interface-introduction.md
     - 中继接口:
       - 💬 聊天（Chat）:
         - OpenAI 格式（Chat Completions）: openai-chat.md

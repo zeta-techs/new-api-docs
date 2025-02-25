@@ -10,7 +10,7 @@ Deepseek-reasoner 是 DeepSeek 推出的推理模型。在输出最终回答之�
 
 ## 💡 请求示例
 
-### 基础文本对话
+### 基础文本对话 ✅
 
 ```bash
 curl https://api.deepseek.com/v1/chat/completions \
@@ -53,7 +53,7 @@ curl https://api.deepseek.com/v1/chat/completions \
 }
 ```
 
-### 流式响应
+### 流式响应 ✅
 
 ```bash
 curl https://api.deepseek.com/v1/chat/completions \

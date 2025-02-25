@@ -10,7 +10,7 @@
 
 ## 💡 请求示例
 
-### 创建图片
+### 创建图片 ✅
 
 ```bash
 # 基础图片生成
@@ -61,7 +61,7 @@ curl https://newapi地址/v1/images/generations \
 }
 ```
 
-### 编辑图片
+### 编辑图片 ✅
 
 ```bash
 curl https://newapi地址/v1/images/edits \
@@ -89,7 +89,7 @@ curl https://newapi地址/v1/images/edits \
 }
 ```
 
-### 生成图片变体
+### 生成图片变体 ✅
 
 ```bash
 curl https://newapi地址/v1/images/variations \

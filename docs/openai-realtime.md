@@ -160,9 +160,9 @@ sequenceDiagram
 - 静音时长
 - 前缀填充
 
-## 🚀 代码示例
+## 💡 请求示例
 
-### WebRTC 连接示例
+### WebRTC 连接 ❌
 
 #### 客户端实现 (浏览器)
 ```javascript
@@ -271,7 +271,7 @@ const responseCreate = {
 dc.send(JSON.stringify(responseCreate));
 ```
 
-### WebSocket 连接示例
+### WebSocket 连接 ✅
 
 #### Node.js (ws模块)
 ```javascript

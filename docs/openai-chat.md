@@ -10,7 +10,7 @@
 
 ## 💡 请求示例
 
-### 基础文本对话
+### 基础文本对话 ✅
 
 ```bash
 curl https://newapi地址/v1/chat/completions \
@@ -57,7 +57,7 @@ curl https://newapi地址/v1/chat/completions \
 }
 ```
 
-### 图像分析对话
+### 图像分析对话 ✅
 
 ```bash
 curl https://newapi地址/v1/chat/completions \
@@ -112,7 +112,7 @@ curl https://newapi地址/v1/chat/completions \
 }
 ```
 
-### 流式响应
+### 流式响应 ✅
 
 ```bash
 curl https://newapi地址/v1/chat/completions \
@@ -146,7 +146,7 @@ curl https://newapi地址/v1/chat/completions \
 {"id":"chatcmpl-123","object":"chat.completion.chunk","created":1694268190,"model":"gpt-4o-mini","system_fingerprint":"fp_44709d6fcb","choices":[{"index":0,"delta":{},"logprobs":null,"finish_reason":"stop"}]}
 ```
 
-### 函数调用
+### 函数调用 ✅
 
 ```bash
 curl https://newapi地址/v1/chat/completions \
@@ -224,7 +224,7 @@ curl https://newapi地址/v1/chat/completions \
 }
 ```
 
-### JSON 模式输出
+### JSON 模式输出 ✅
 
 ```bash
 curl https://newapi地址/v1/chat/completions \

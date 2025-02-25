@@ -18,7 +18,7 @@
 
 ## 💡 请求示例
 
-### 创建文本嵌入
+### 创建文本嵌入 ✅
 
 ```bash
 curl https://newapi地址/v1/embeddings \
@@ -56,7 +56,7 @@ curl https://newapi地址/v1/embeddings \
 }
 ```
 
-### 批量创建嵌入
+### 批量创建嵌入 ✅
 
 ```bash
 curl https://newapi地址/v1/embeddings \

@@ -14,7 +14,7 @@ OpenAI 音频 API 提供了三个主要功能:
 
 ## 💡 请求示例
 
-### 文本转语音
+### 文本转语音 ✅
 
 ```bash
 curl https://newapi地址/v1/audio/speech \
@@ -28,7 +28,7 @@ curl https://newapi地址/v1/audio/speech \
   --output speech.mp3
 ```
 
-### 语音转文本
+### 语音转文本 ✅
 
 ```bash
 curl https://newapi地址/v1/audio/transcriptions \
@@ -46,7 +46,7 @@ curl https://newapi地址/v1/audio/transcriptions \
 }
 ```
 
-### 音频翻译
+### 音频翻译 ✅
 
 ```bash
 curl https://newapi地址/v1/audio/translations \

@@ -12,7 +12,7 @@
 
 ## 💡 请求示例
 
-### 基础文本对话
+### 基础文本对话 ✅
 
 ```bash
 curl https://newapi地址/v1/messages \
@@ -51,7 +51,7 @@ curl https://newapi地址/v1/messages \
 }
 ```
 
-### 图像分析对话
+### 图像分析对话 ✅
 
 ```bash
 curl https://newapi地址/v1/messages \
@@ -105,7 +105,7 @@ curl https://newapi地址/v1/messages \
 }
 ```
 
-### 工具调用
+### 工具调用 ✅
 
 ```bash
 curl https://newapi地址/v1/messages \
@@ -164,7 +164,7 @@ curl https://newapi地址/v1/messages \
 }
 ```
 
-### 流式响应
+### 流式响应 ✅
 
 ```bash
 curl https://newapi地址/v1/messages \
