@@ -207,7 +207,7 @@ hide:
     
     在服务器上部署 New API，快速搭建您的 AI 服务网关
     
-    [了解更多 →](/installation/quick-local-installation){ .more-link }
+    [了解更多 →](installation/quick-local-installation){ .more-link }
 
 -   :material-api:{ .twemoji } 
     
@@ -217,7 +217,7 @@ hide:
     
     使用标准 OpenAI 格式接口，快速接入您的AI应用程序
     
-    [了解更多 →](/installation/quick-call){ .more-link }
+    [了解更多 →](installation/quick-call){ .more-link }
 
 -   :material-account-group:{ .twemoji } 
     
@@ -227,7 +227,7 @@ hide:
     
     图文并茂的方式带您快速了解 New API 的核心功能及使用方法
     
-    [了解更多 →](/installation/quick-guide){ .more-link }
+    [了解更多 →](installation/quick-guide){ .more-link }
 
 </div>
 
@@ -243,7 +243,7 @@ hide:
     
     了解项目介绍、特性说明、技术架构和路线图
     
-    [了解更多 →](/wiki/project-introduction){ .more-link }
+    [了解更多 →](wiki/project-introduction){ .more-link }
 
 -   :fontawesome-solid-wrench:{ .twemoji } 
     
@@ -253,7 +253,7 @@ hide:
     
     快速入门、精细化安装和参数配置指南
     
-    [了解更多 →](/installation/quick-local-installation){ .more-link }
+    [了解更多 →](installation/quick-local-installation){ .more-link }
 
 -   :fontawesome-solid-user:{ .twemoji } 
     
@@ -263,7 +263,7 @@ hide:
     
     详细的使用说明和最佳实践
     
-    [了解更多 →](/user-guide/i18n){ .more-link }
+    [了解更多 →](user-guide/i18n){ .more-link }
 
 -   :fontawesome-solid-code:{ .twemoji } 
     
@@ -273,7 +273,7 @@ hide:
     
     全面的API接口说明和调用示例
     
-    [了解更多 →](/api-docs/interface-introduction){ .more-link }
+    [了解更多 →](api-docs/interface-introduction){ .more-link }
 
 -   :fontawesome-solid-headset:{ .twemoji } 
     
@@ -283,6 +283,6 @@ hide:
     
     常见问题解答和技术支持渠道
     
-    [了解更多 →](/support/community-interaction){ .more-link }
+    [了解更多 →](support/community-interaction){ .more-link }
 
 </div>
