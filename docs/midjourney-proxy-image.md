@@ -709,7 +709,7 @@ Authorization: Bearer $NEWAPI_API_KEY$OPENAI_API_KEY
 
 ## 📥 响应
 
-### 响应对象说明
+### 成功响应
 
 #### `action`
 - 类型：枚举字符串

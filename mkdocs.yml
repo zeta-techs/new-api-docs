@@ -79,6 +79,7 @@ nav:
         - OpenAI 格式: openai-embedding.md
       - 🔄 重排序（Rerank）:
         - Jina AI 格式: jinaai-rerank.md
+        - Cohere 格式: cohere-rerank.md
       - ⚡ 实时对话（Realtime）:
         - OpenAI 格式: openai-realtime.md
       - 🖼️ 图像（Image）:

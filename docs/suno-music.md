@@ -357,81 +357,83 @@ GET /suno/fetch/{{task_id}}
 }
 ```
 
-### 响应对象
+### 成功响应
 
-#### `code`
+#### 基础响应字段
+
+##### `code`
 - 类型:String
 - 说明:请求状态,success 为成功 
 
-#### `message` 
+##### `message` 
 - 类型:String
 - 说明:请求失败时的错误信息
 
-#### `data`
+##### `data`
 - 类型:根据不同接口而异
 - 说明:请求成功时的返回数据
   - 生成歌曲、歌词、上传音频、歌曲拼接接口:返回任务 ID 字符串
   - 任务查询接口:返回任务对象或任务对象数组
 
-### 任务对象
+#### 任务相关对象
 
-#### `task_id`
+##### 任务对象
+###### `task_id`
 - 类型:String  
 - 说明:任务 ID
 
-#### `notify_hook`
+###### `notify_hook`
 - 类型:String
 - 说明:任务完成后的回调通知地址
 
-#### `action`
+###### `action`
 - 类型:String
 - 说明:任务类型,可选值:MUSIC、LYRICS  
 
-#### `status` 
+###### `status` 
 - 类型:String
 - 说明:任务状态,可选值:IN_PROGRESS、SUCCESS、FAIL
 
-#### `fail_reason` 
+###### `fail_reason` 
 - 类型:String
 - 说明:任务失败原因  
 
-#### `submit_time`
+###### `submit_time`
 - 类型:Integer
 - 说明:任务提交时间戳
 
-#### `start_time`
+###### `start_time`
 - 类型:Integer 
 - 说明:任务开始时间戳
 
-#### `finish_time`
+###### `finish_time`
 - 类型:Integer
 - 说明:任务结束时间戳 
 
-#### `progress`
+###### `progress`
 - 类型:String
 - 说明:任务进度百分比
 
-#### `data`
+###### `data`
 - 类型:根据任务类型不同而异 
 - 说明:
   - 音乐生成任务:歌曲对象数组
   - 歌词生成任务:歌词对象  
 
-### 歌曲对象
-
-#### `id`
+##### 歌曲对象
+###### `id`
 - 类型:String
 - 说明:歌曲 ID
 
-#### `title`
+###### `title`
 - 类型:String
 - 说明:歌曲标题
 
-#### `status` 
+###### `status` 
 - 类型:String
 - 说明:歌曲状态 
 
-#### `metadata`
+###### `metadata`
 - 类型:Object
 - 说明:歌曲元数据
   - tags:歌曲风格标签
@@ -442,41 +444,40 @@ GET /suno/fetch/{{task_id}}
   - audio_prompt_id:音频 prompt ID
   - gpt_description_prompt:灵感来源描述
 
-#### `audio_url`
+###### `audio_url`
 - 类型:String
 - 说明:歌曲音频的 URL 地址
 
-#### `image_url`
+###### `image_url`
 - 类型:String
 - 说明:歌曲封面图的 URL 地址  
 
-#### `video_url` 
+###### `video_url` 
 - 类型:String
 - 说明:歌曲视频的 URL 地址
 
-#### `model_name`
+###### `model_name`
 - 类型:String
 - 说明:生成歌曲使用的模型名称
 
-#### `major_model_version`
+###### `major_model_version`
 - 类型:String 
 - 说明:模型主版本号
 
-### 歌词对象
-
-#### `id`
+##### 歌词对象
+###### `id`
 - 类型:String
 - 说明:歌词 ID
 
-#### `text`
+###### `text`
 - 类型:String 
 - 说明:歌词内容
 
-#### `title` 
+###### `title` 
 - 类型:String
 - 说明:歌词标题  
 
-#### `status`
+###### `status`
 - 类型:String
 - 说明:歌词状态
 

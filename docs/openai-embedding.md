@@ -160,9 +160,9 @@ Authorization: Bearer $NEWAPI_API_KEY
 
 ## 📥 响应
 
-返回嵌入对象列表。
+### 成功响应
 
-### 响应对象说明
+返回嵌入对象列表。
 
 #### `object`
 

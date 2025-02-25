@@ -101,7 +101,7 @@ Authorization: Bearer $NEWAPI_API_KEY
 
 ## 📥 响应
 
-### 响应对象说明
+### 成功响应
 
 #### `results`
 - 类型：数组

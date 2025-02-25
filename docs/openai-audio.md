@@ -216,13 +216,15 @@ Authorization: Bearer $NEWAPI_API_KEY
 
 ## 📥 响应
 
-### 文本转语音
+### 成功响应
+
+#### 文本转语音
 
 返回二进制音频文件内容。
 
-### 语音转文本
+#### 语音转文本
 
-#### 基础 JSON 格式
+##### 基础 JSON 格式
 
 ```json
 {
@@ -230,7 +232,7 @@ Authorization: Bearer $NEWAPI_API_KEY
 }
 ```
 
-#### 详细 JSON 格式
+##### 详细 JSON 格式
 
 ```json
 {
@@ -255,7 +257,7 @@ Authorization: Bearer $NEWAPI_API_KEY
 }
 ```
 
-### 音频翻译
+#### 音频翻译
 
 ```json
 {
