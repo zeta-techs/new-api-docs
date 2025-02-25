@@ -230,7 +230,7 @@ app.get("/session", async (req, res) => {
   const r = await fetch("https://newapi地址/v1/realtime/sessions", {
     method: "POST",
     headers: {
-      "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`,
+      "Authorization": `Bearer ${process.env.NEW_API_KEY}`,
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
@@ -277,10 +277,10 @@ dc.send(JSON.stringify(responseCreate));
 ```javascript
 import WebSocket from "ws";
 
-const url = "wss://api.openai.com/v1/realtime?model=gpt-4o-realtime-preview-2024-12-17";
+const url = "wss://newapi地址/v1/realtime?model=gpt-4o-realtime-preview-2024-12-17";
 const ws = new WebSocket(url, {
   headers: {
-    "Authorization": "Bearer " + process.env.OPENAI_API_KEY,
+    "Authorization": "Bearer " + process.env.NEW_API_KEY,
     "OpenAI-Beta": "realtime=v1",
   },
 });
@@ -303,11 +303,11 @@ import os
 import json
 import websocket
 
-OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
+NEW_API_KEY = os.environ.get("NEW_API_KEY")
 
-url = "wss://api.openai.com/v1/realtime?model=gpt-4o-realtime-preview-2024-12-17"
+url = "wss://newapi地址/v1/realtime?model=gpt-4o-realtime-preview-2024-12-17"
 headers = [
-    "Authorization: Bearer " + OPENAI_API_KEY,
+    "Authorization: Bearer " + NEW_API_KEY,
     "OpenAI-Beta: realtime=v1"
 ]
 
@@ -337,11 +337,11 @@ ws.run_forever()
 */
 
 const ws = new WebSocket(
-  "wss://api.openai.com/v1/realtime?model=gpt-4o-realtime-preview-2024-12-17",
+  "wss://newapi地址/v1/realtime?model=gpt-4o-realtime-preview-2024-12-17",
   [
     "realtime",
     // 认证
-    "openai-insecure-api-key." + OPENAI_API_KEY, 
+    "openai-insecure-api-key." + NEW_API_KEY, 
     // 可选
     "openai-organization." + OPENAI_ORG_ID,
     "openai-project." + OPENAI_PROJECT_ID,
