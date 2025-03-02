@@ -72,16 +72,15 @@ nav:
       - 2025年: wiki/2025-roadmap.md
     - 🙏 特别鸣谢: wiki/special-thanks.md
   - 安装指南:
-    - 🚀 快速入门指南: 
-      - 快速安装: installation/quick-local-installation.md
-      - 快速调用: installation/quick-call.md
-      - 快速指南: installation/quick-guide.md
-    - 🔧 精细化安装:
-      - Docker Compose安装: installation/docker-compose-installation.md
-      - Docker安装: installation/docker-installation.md
-      - 宝塔面板Docker安装: installation/bt-docker-installation.md
-    - ⚙️ 参数配置:
-      - docker-compose.yml配置: installation/docker-compose-configuration.md
+    - 🔧 部署方式:
+      - Docker 部署: installation/docker-installation.md
+      - Docker Compose 部署: installation/docker-compose-installation.md
+      - 宝塔面板部署: installation/bt-docker-installation.md
+      - 集群部署: installation/cluster-deployment.md
+    - ⚙️ 配置与维护:
+      - 系统更新: installation/system-update.md
+      - 环境变量配置: installation/environment-variables.md
+      - Docker Compose 配置文件: installation/docker-compose-yml.md
   - 用户指南:
     - 应用接入:
       - 1️⃣ NextChat: user-guide/nextchat-integration.md
