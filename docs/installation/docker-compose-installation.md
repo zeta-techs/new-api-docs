@@ -34,7 +34,7 @@ cd new-api
 
 2. 在该目录中创建`docker-compose.yml`文件
 
-   您可以参考[Docker Compose配置说明](docker-compose.md)文档中的配置示例，根据您的需求选择：
+   您可以参考[Docker Compose配置说明](docker-compose-yml.md)文档中的配置示例，根据您的需求选择：
    
    - 生产环境推荐使用完整配置（包含MySQL和Redis）
    - 测试环境可以使用简化配置

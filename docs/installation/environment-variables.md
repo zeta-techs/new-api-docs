@@ -35,7 +35,7 @@
 | `BATCH_UPDATE_ENABLED` | 启用数据库批量更新聚合 | `false` | `BATCH_UPDATE_ENABLED=true` |
 | `BATCH_UPDATE_INTERVAL` | 批量更新聚合时间间隔(秒) | `5` | `BATCH_UPDATE_INTERVAL=10` |
 
-## 🌐 多节点与安全配置
+## 🌐 多节点与安全配置 {#多节点与安全配置}
 
 | 环境变量 | 说明 | 默认值 | 示例 |
 |---------|------|-------|------|
@@ -193,4 +193,4 @@ services:
       - CHANNEL_UPDATE_FREQUENCY=1440
 ```
 
-有关完整的Docker Compose配置，包括更多环境变量设置选项，请参考[Docker Compose配置说明](docker-compose.md)文档。
+有关完整的Docker Compose配置，包括更多环境变量设置选项，请参考[Docker Compose配置说明](docker-compose-yml.md)文档。
