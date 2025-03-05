@@ -97,6 +97,6 @@
 !!! note "没有找到您的问题？"
     如果这里没有解答您的问题，欢迎：
     
-    1. 查看 [完整文档](/getting-started)
+    1. 查看 [完整文档](../getting-started.md)
     2. 在 [GitHub上提交issue](feedback-issues.md)
     3. 加入 [QQ交流群寻求帮助](community-interaction.md)
