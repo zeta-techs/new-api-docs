@@ -251,8 +251,6 @@ hide:
   }
 </style>
 
-# 🚀 **开始使用**
-
 ## 🎯 **部署方式选择**
 
 <div class="grid cards" markdown>
