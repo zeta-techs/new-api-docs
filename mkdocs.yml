@@ -72,6 +72,7 @@ nav:
       - 2025年: wiki/2025-roadmap.md
     - 🙏 特别鸣谢: wiki/special-thanks.md
   - 安装指南:
+    - 🏠 安装指南: installation/index.md
     - 🔧 部署方式:
       - Docker 部署: installation/docker-installation.md
       - Docker Compose 部署: installation/docker-compose-installation.md
@@ -115,7 +116,7 @@ nav:
             - 🖥️ 系统设置: user-guide/system-settings.md
             - 🔧 其他设置: user-guide/other-settings.md
   - 接口文档:
-    - 接口介绍: api-docs/interface-introduction.md
+    - 🏠 接口文档: api-docs/index.md
     - 中继接口:
       - 💬 聊天（Chat）:
         - OpenAI 格式（Chat Completions）: api-docs/openai-chat.md
@@ -138,11 +139,11 @@ nav:
     - 前端接口:
       - 敬请期待: coming-soon.md
   - 帮助支持:
+    - 🏠 帮助支持: support/index.md
     - 🌐 社区交流: support/community-interaction.md
     - 🐛 反馈问题: support/feedback-issues.md
-    # - 📧 联系我们: support/contact-us.md
     - ❓ 常见问题: support/faq.md
-    - ☕ 给我们买一杯咖啡: support/buy-us-a-coffee.md
+    - ☕ 请我们喝咖啡: support/buy-us-a-coffee.md
 
 plugins:
   - blog
