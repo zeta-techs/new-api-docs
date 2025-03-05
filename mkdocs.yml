@@ -190,7 +190,8 @@ markdown_extensions:
       custom_checkbox: true
   - pymdownx.tilde
 
-copyright: Copyright &copy; 2025 Quantum Nous. All Rights Reserved. 量子智元公司 版权所有
+# copyright: Copyright &copy; 2025 Quantum Nous. All Rights Reserved. 量子智元公司 版权所有
+copyright: Copyright &copy; 2025 New API. All Rights Reserved.
 
 extra:
   social:
