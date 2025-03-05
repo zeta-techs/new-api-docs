@@ -259,7 +259,7 @@ hide:
     
     [了解更多 →](installation/docker-installation.md){ .more-link }
 
--   :material-layers:{ .twemoji } 
+-   :fontawesome-brands-docker:{ .twemoji } 
     
     **Docker Compose部署**
     
@@ -331,7 +331,7 @@ hide:
     
     ---
     
-    常见问题解答和技术支持渠道
+    常见问题解答和社区交流
     
     [了解更多 →](support/index.md){ .more-link }
 

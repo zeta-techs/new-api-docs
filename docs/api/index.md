@@ -60,30 +60,40 @@ hide:
 
   /* 新增：优化卡片链接样式 */
   .md-typeset .grid.cards > ul > li a {
-    display: inline-block;
-    padding: 0.4rem 1.2rem;
-    margin-top: 0.6rem;
-    background-color: rgba(255, 255, 255, 0.2);
-    border-radius: 2rem;
-    color: var(--md-primary-bg-color);
+    display: inline-flex;
+    align-items: center;
+    margin-top: 1.2em;
+    padding: 0.5em 1.2em;
+    color: white;
+    background-color: rgba(255, 255, 255, 0.15);
+    border-radius: 2em;
+    transition: all 0.3s ease;
     font-weight: 500;
-    transition: all 0.2s ease;
+    font-size: 0.9em;
+    letter-spacing: 0.03em;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+    position: relative;
+    overflow: hidden;
     text-decoration: none;
   }
 
   .md-typeset .grid.cards > ul > li a:hover {
-    background-color: rgba(255, 255, 255, 0.3);
-    transform: translateX(0.2rem);
+    background-color: rgba(255, 255, 255, 0.25);
+    text-decoration: none;
+    box-shadow: 0 5px 12px rgba(0, 0, 0, 0.2);
+    transform: translateX(5px);
   }
 
-  .md-typeset .grid.cards > ul > li a::after {
-    content: " →";
+  .md-typeset .grid.cards > ul > li a:after {
+    content: "→";
     opacity: 0;
-    transition: opacity 0.2s ease;
+    margin-left: -15px;
+    transition: all 0.2s ease;
   }
 
-  .md-typeset .grid.cards > ul > li a:hover::after {
+  .md-typeset .grid.cards > ul > li a:hover:after {
     opacity: 1;
+    margin-left: 5px;
   }
 </style>
 
