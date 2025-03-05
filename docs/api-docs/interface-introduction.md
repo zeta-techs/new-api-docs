@@ -57,6 +57,34 @@ hide:
     background-color: var(--md-primary-fg-color--light);
     color: var(--md-primary-bg-color);
   }
+
+  /* 新增：优化卡片链接样式 */
+  .md-typeset .grid.cards > ul > li a {
+    display: inline-block;
+    padding: 0.4rem 1.2rem;
+    margin-top: 0.6rem;
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 2rem;
+    color: var(--md-primary-bg-color);
+    font-weight: 500;
+    transition: all 0.2s ease;
+    text-decoration: none;
+  }
+
+  .md-typeset .grid.cards > ul > li a:hover {
+    background-color: rgba(255, 255, 255, 0.3);
+    transform: translateX(0.2rem);
+  }
+
+  .md-typeset .grid.cards > ul > li a::after {
+    content: " →";
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+
+  .md-typeset .grid.cards > ul > li a:hover::after {
+    opacity: 1;
+  }
 </style>
 
 # 接口总览
