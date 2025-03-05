@@ -140,7 +140,7 @@ nav:
   - 帮助支持:
     - 🌐 社区交流: support/community-interaction.md
     - 🐛 反馈问题: support/feedback-issues.md
-    - 📧 联系我们: support/contact-us.md
+    # - 📧 联系我们: support/contact-us.md
     - ❓ 常见问题: support/faq.md
     - ☕ 给我们买一杯咖啡: support/buy-us-a-coffee.md
 
