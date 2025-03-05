@@ -1,10 +1,8 @@
 # Anthropic 对话格式（Messages）
 
-> 官方文档请参阅：
-
-> [Anthropic Messages](https://docs.anthropic.com/en/api/messages)
-
-> [Anthropic Streaming Messages](https://docs.anthropic.com/en/api/messages-streaming)
+!!! info "官方文档"
+    - [Anthropic Messages](https://docs.anthropic.com/en/api/messages)
+    - [Anthropic Streaming Messages](https://docs.anthropic.com/en/api/messages-streaming)
 
 ## 📝 简介
 

@@ -1,8 +1,7 @@
 # OpenAI 音频格式
 
-> 官方文档请参阅：
-
-> [OpenAI Audio](https://platform.openai.com/docs/api-reference/audio)
+!!! info "官方文档"
+    [OpenAI Audio](https://platform.openai.com/docs/api-reference/audio)
 
 ## 📝 简介
 

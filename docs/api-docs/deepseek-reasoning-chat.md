@@ -1,8 +1,7 @@
 # Deepseek reasoning 对话格式（类Chat Completions）
 
-> 官方文档请参阅：
-
-> [推理模型 (deepseek-reasoner)](https://api-docs.deepseek.com/zh-cn/guides/reasoning_model)
+!!! info "官方文档"
+    [推理模型 (deepseek-reasoner)](https://api-docs.deepseek.com/zh-cn/guides/reasoning_model)
 
 ## 📝 简介
 
@@ -214,7 +213,8 @@ Authorization: Bearer $NEWAPI_API_KEY
 
 ![Deepseek reasoning 上下文拼接示意图](../assets/deepseek_r1_multiround_example_cn.png)
 
-> 请注意，如果您在输入的 messages 序列中，传入了reasoning_content，API 会返回 400 错误。因此，请删除 API 响应中的 reasoning_content 字段，再发起 API 请求，方法如下方使用示例所示。
+!!! warning "注意"
+    如果您在输入的 messages 序列中，传入了reasoning_content，API 会返回 400 错误。因此，请删除 API 响应中的 reasoning_content 字段，再发起 API 请求，方法如下方使用示例所示。
 
 使用示例:
 

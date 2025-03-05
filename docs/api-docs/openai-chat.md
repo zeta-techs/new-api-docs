@@ -1,8 +1,7 @@
 # OpenAI 对话格式（Chat Completions）
 
-> 官方文档请参阅：
-
-> [OpenAI Chat](https://platform.openai.com/docs/api-reference/chat)
+!!! info "官方文档"
+    [OpenAI Chat](https://platform.openai.com/docs/api-reference/chat)
 
 ## 📝 简介
 

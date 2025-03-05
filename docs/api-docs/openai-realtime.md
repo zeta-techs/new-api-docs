@@ -1,10 +1,8 @@
 # OpenAI 实时对话接口
 
-> 官方文档请参阅：
-
-> [OpenAI Realtime WebRTC](https://platform.openai.com/docs/guides/realtime-webrtc)
-
-> [OpenAI Realtime WebSocket](https://platform.openai.com/docs/guides/realtime-websocket)
+!!! info "官方文档"
+    - [OpenAI Realtime WebRTC](https://platform.openai.com/docs/guides/realtime-webrtc)
+    - [OpenAI Realtime WebSocket](https://platform.openai.com/docs/guides/realtime-websocket)
 
 ## 📝 概述
 

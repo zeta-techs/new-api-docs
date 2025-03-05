@@ -1,8 +1,7 @@
 # OpenAI 图像格式（Dall·E）
 
-> 官方文档请参阅：
-
-> [OpenAI Images](https://platform.openai.com/docs/api-reference/images)
+!!! info "官方文档"
+    [OpenAI Images](https://platform.openai.com/docs/api-reference/images)
 
 ## 📝 简介
 

@@ -1,8 +1,7 @@
 # Cohere 重排序格式（Rerank）
 
-> 官方文档请参阅：
-
-> [Cohere Rerank](https://docs.cohere.com/reference/rerank)
+!!! info "官方文档"
+    [Cohere Rerank](https://docs.cohere.com/reference/rerank)
 
 ## 📝 简介
 

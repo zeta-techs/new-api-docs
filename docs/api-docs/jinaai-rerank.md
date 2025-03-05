@@ -1,8 +1,7 @@
 # Jina AI 重排序格式（Rerank）
 
-> 官方文档请参阅：
-
-> [Jina AI Rerank](https://jina.ai/reranker)
+!!! info "官方文档"
+    [Jina AI Rerank](https://jina.ai/reranker)
 
 ## 📝 简介
 

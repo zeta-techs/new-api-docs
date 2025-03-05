@@ -101,11 +101,9 @@ hide:
 
     支持多种主流聊天模型格式：
     
-    - OpenAI Chat Completions
-    - Anthropic Messages
-    - Deepseek Reasoning Chat
-
-    [查看详情 →](openai-chat.md)
+    - [OpenAI Chat →](openai-chat.md)
+    - [Anthropic Chat →](anthropic-chat.md)
+    - [Deepseek Chat →](deepseek-reasoning-chat.md)
 
 -   :material-alphabetical:{ .twemoji }
 
@@ -115,9 +113,7 @@ hide:
 
     文本向量嵌入服务：
     
-    - OpenAI Embeddings 格式
-
-    [查看详情 →](openai-embedding.md)
+    - [OpenAI Embeddings →](openai-embedding.md)
 
 -   :material-swap-vertical:{ .twemoji }
 
@@ -127,10 +123,8 @@ hide:
 
     搜索结果重排序服务：
     
-    - Jina AI Rerank
-    - Cohere Rerank
-
-    [查看详情 →](jinaai-rerank.md)
+    - [Jina AI Rerank →](jinaai-rerank.md)
+    - [Cohere Rerank →](cohere-rerank.md)
 
 -   :material-lightning-bolt:{ .twemoji }
 
@@ -140,9 +134,7 @@ hide:
 
     支持流式实时对话：
     
-    - OpenAI 流式输出格式
-
-    [查看详情 →](openai-realtime.md)
+    - [OpenAI Realtime →](openai-realtime.md)
 
 -   :material-image:{ .twemoji }
 
@@ -152,10 +144,8 @@ hide:
 
     AI 图像生成服务：
     
-    - OpenAI DALL·E
-    - Midjourney Proxy (Plus)
-
-    [查看详情 →](openai-image.md)
+    - [OpenAI DALL·E →](openai-image.md)
+    - [Midjourney Proxy →](midjourney-proxy-image.md)
 
 -   :material-volume-high:{ .twemoji }
 
@@ -165,9 +155,7 @@ hide:
 
     语音相关服务：
     
-    - OpenAI 音频格式
-
-    [查看详情 →](openai-audio.md)
+    - [OpenAI Audio →](openai-audio.md)
 
 -   :material-music:{ .twemoji }
 
@@ -177,9 +165,7 @@ hide:
 
     AI 音乐生成服务：
     
-    - Suno API 格式
-
-    [查看详情 →](suno-music.md)
+    - [Suno API →](suno-music.md)
 
 </div>
 

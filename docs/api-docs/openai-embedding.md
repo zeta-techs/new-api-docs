@@ -1,8 +1,7 @@
 # OpenAI 嵌入格式（Embeddings）
 
-> 官方文档请参阅：
-
-> [OpenAI Embeddings](https://platform.openai.com/docs/api-reference/embeddings)
+!!! info "官方文档"
+    [OpenAI Embeddings](https://platform.openai.com/docs/api-reference/embeddings)
 
 ## 📝 简介
 
