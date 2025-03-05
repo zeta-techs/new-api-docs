@@ -67,9 +67,9 @@ nav:
     - ✨ 特性说明: wiki/features-introduction.md
     - 🏗️ 技术架构: wiki/technical-architecture.md
     - 📝 更新日志: wiki/changelog.md
-    - 🤖 模型支持: wiki/supported-models.md
-    - 🗺️ 路线图:
-      - 2025年: wiki/2025-roadmap.md
+    # - 🤖 模型支持: wiki/supported-models.md
+    # - 🗺️ 路线图:
+    #   - 2025年: wiki/2025-roadmap.md
     - 🙏 特别鸣谢: wiki/special-thanks.md
   - 安装指南:
     - 🏠 安装指南: installation/index.md
@@ -82,39 +82,39 @@ nav:
       - 系统更新: installation/system-update.md
       - 环境变量配置: installation/environment-variables.md
       - Docker Compose 配置文件: installation/docker-compose-yml.md
-  - 用户指南:
-    - 应用接入:
-      - 1️⃣ NextChat: user-guide/nextchat-integration.md
-      - 2️⃣ Cursor: user-guide/cursor-integration.md
-    - 系统操作:
-      - 全局:
-        - 🌐 多语言（i18n）: user-guide/i18n.md
-        - 🎨 主题切换: user-guide/theme-switch.md
-      - 普通用户:
-        - 👤 注册与登录: user-guide/user-registration-and-login.md
-        - 💰 模型定价: user-guide/model-pricing.md
-        - ℹ️ 关于: user-guide/about.md
-        - 控制台:
-          - 🎮 Playground: user-guide/playground.md
-          - 💬 聊天: user-guide/chat.md
-          - 🔑 令牌管理: user-guide/token-management.md
-          - 📊 数据看板: user-guide/dashboard.md
-          - 💳 钱包: user-guide/wallet.md
-          - 📝 日志: user-guide/logs.md
-          - 🎨 绘画: user-guide/painting.md
-          - ⏱️ 异步任务: user-guide/async-tasks.md
-          - 设置:
-            - ⚙️ 个人设置: user-guide/personal-settings.md
-      - 管理员:
-        - 控制台:
-          - 🔌 渠道管理: user-guide/channel-management.md
-          - 🎟️ 兑换码管理: user-guide/redeem-code-management.md
-          - 👥 用户管理: user-guide/user-management.md
-          - 设置:
-            - 📈 运营设置: user-guide/operation-settings.md
-            - 🚦 速率限制设置: user-guide/rate-limit-settings.md
-            - 🖥️ 系统设置: user-guide/system-settings.md
-            - 🔧 其他设置: user-guide/other-settings.md
+  # - 用户指南:
+  #   - 应用接入:
+  #     - 1️⃣ NextChat: user-guide/nextchat-integration.md
+  #     - 2️⃣ Cursor: user-guide/cursor-integration.md
+  #   - 系统操作:
+  #     - 全局:
+  #       - 🌐 多语言（i18n）: user-guide/i18n.md
+  #       - 🎨 主题切换: user-guide/theme-switch.md
+  #     - 普通用户:
+  #       - 👤 注册与登录: user-guide/user-registration-and-login.md
+  #       - 💰 模型定价: user-guide/model-pricing.md
+  #       - ℹ️ 关于: user-guide/about.md
+  #       - 控制台:
+  #         - 🎮 Playground: user-guide/playground.md
+  #         - 💬 聊天: user-guide/chat.md
+  #         - 🔑 令牌管理: user-guide/token-management.md
+  #         - 📊 数据看板: user-guide/dashboard.md
+  #         - 💳 钱包: user-guide/wallet.md
+  #         - 📝 日志: user-guide/logs.md
+  #         - 🎨 绘画: user-guide/painting.md
+  #         - ⏱️ 异步任务: user-guide/async-tasks.md
+  #         - 设置:
+  #           - ⚙️ 个人设置: user-guide/personal-settings.md
+  #     - 管理员:
+  #       - 控制台:
+  #         - 🔌 渠道管理: user-guide/channel-management.md
+  #         - 🎟️ 兑换码管理: user-guide/redeem-code-management.md
+  #         - 👥 用户管理: user-guide/user-management.md
+  #         - 设置:
+  #           - 📈 运营设置: user-guide/operation-settings.md
+  #           - 🚦 速率限制设置: user-guide/rate-limit-settings.md
+  #           - 🖥️ 系统设置: user-guide/system-settings.md
+  #           - 🔧 其他设置: user-guide/other-settings.md
   - 接口文档:
     - 🏠 接口文档: api/index.md
     - 中继接口:
@@ -151,6 +151,7 @@ plugins:
       separator: '[\s\u200b\-_,:!=\[\]()"`/]+|\.(?!\d)|&[lg]t;|(?!\b)(?=[A-Z][a-z])'
   # - social
   - tags
+  - macros
   # - minify:
   #     minify_html: true
 
@@ -190,6 +191,8 @@ markdown_extensions:
   - pymdownx.tasklist:
       custom_checkbox: true
   - pymdownx.tilde
+  - tables
+  - meta
 
 # copyright: Copyright &copy; 2025 Quantum Nous. All Rights Reserved. 量子智元公司 版权所有
 copyright: Copyright &copy; 2025 New API. All Rights Reserved.
@@ -210,3 +213,4 @@ extra:
     cookies:
       analytics: Google Analytics
   generator: false
+  github_repo: Calcium-Ion/new-api

@@ -35,7 +35,7 @@
 | `BATCH_UPDATE_ENABLED` | 启用数据库批量更新聚合 | `false` | `BATCH_UPDATE_ENABLED=true` |
 | `BATCH_UPDATE_INTERVAL` | 批量更新聚合时间间隔(秒) | `5` | `BATCH_UPDATE_INTERVAL=10` |
 
-## 🌐 多节点与安全配置 {#多节点与安全配置}
+## 🌐 多节点与安全配置
 
 | 环境变量 | 说明 | 默认值 | 示例 |
 |---------|------|-------|------|

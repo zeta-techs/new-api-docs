@@ -313,7 +313,8 @@ hide:
     
     详细的使用说明和最佳实践
     
-    [了解更多 →](user-guide/i18n.md){ .more-link }
+    <!-- [了解更多 →](user-guide/i18n.md){ .more-link } -->
+    [敬请期待](){ .more-link }
 
 -   :fontawesome-solid-code:{ .twemoji } 
     
