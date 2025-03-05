@@ -323,7 +323,7 @@ hide:
     
     全面的API接口说明和调用示例
     
-    [了解更多 →](api-docs/index.md){ .more-link }
+    [了解更多 →](api/index.md){ .more-link }
 
 -   :fontawesome-solid-headset:{ .twemoji } 
     
