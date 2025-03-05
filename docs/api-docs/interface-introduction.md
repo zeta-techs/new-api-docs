@@ -153,7 +153,7 @@ hide:
     AI 图像生成服务：
     
     - OpenAI DALL·E
-    - Midjourney Proxy/Plus
+    - Midjourney Proxy (Plus)
 
     [查看详情 →](openai-image.md)
 
