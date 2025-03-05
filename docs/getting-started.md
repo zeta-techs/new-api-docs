@@ -5,25 +5,25 @@ hide:
   - toc
 ---
 
-<style>  
-  /* 卡片容器样式增强 */
+<style>
+  /* 卡片容器样式优化 */
   .md-typeset .grid.cards > ul {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
-    gap: 1.5rem;
-    margin: 2.5em 0;
+    gap: 1.2rem;
+    margin: 2em 0;
   }
   
-  /* 卡片基础样式增强 */
+  /* 卡片基础样式 */
   .md-typeset .grid.cards > ul > li {
     border: none;
-    border-radius: 1.2rem;
+    border-radius: 1rem;
     display: flex;
     flex-direction: column;
     margin: 0;
-    padding: 2em 1.8em;
+    padding: 1.8em 1.5em;
     transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
     color: white;
     position: relative;
     overflow: hidden;
@@ -33,11 +33,11 @@ hide:
   
   /* 卡片悬停效果增强 */
   .md-typeset .grid.cards > ul > li:hover {
-    transform: translateY(-10px) scale(1.03);
-    box-shadow: 0 20px 35px rgba(0, 0, 0, 0.2);
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.18);
   }
   
-  /* 卡片悬停时的光效增强 */
+  /* 卡片悬停时的光效 */
   .md-typeset .grid.cards > ul > li:before {
     content: "";
     position: absolute;
@@ -48,7 +48,7 @@ hide:
     background: linear-gradient(
       90deg, 
       rgba(255, 255, 255, 0) 0%, 
-      rgba(255, 255, 255, 0.3) 50%, 
+      rgba(255, 255, 255, 0.2) 50%, 
       rgba(255, 255, 255, 0) 100%
     );
     transition: all 0.6s;
@@ -59,114 +59,72 @@ hide:
     left: 100%;
   }
   
-  /* 部署方式卡片颜色设置 - 增强饱和度 */
+  /* 卡片暗色遮罩优化 */
+  .md-typeset .grid.cards > ul > li:after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at center, rgba(0, 0, 0, 0.05) 0%, rgba(0, 0, 0, 0.2) 100%);
+    pointer-events: none;
+    z-index: 1;
+  }
+  
+  /* 卡片内容层叠设置 */
+  .md-typeset .grid.cards > ul > li > * {
+    position: relative;
+    z-index: 3;
+  }
+  
+  /* 部署方式卡片颜色设置 */
   /* Docker卡片 */
   .md-typeset .grid.cards:nth-of-type(1) > ul > li:nth-child(1) {
-    background: linear-gradient(135deg, #1a47c5 0%, #2078d9 100%);
+    background: linear-gradient(135deg, #2457c5 0%, #2b88d9 100%);
   }
   
   /* Docker Compose卡片 */
   .md-typeset .grid.cards:nth-of-type(1) > ul > li:nth-child(2) {
-    background: linear-gradient(135deg, #0aa8cc 0%, #09c1b6 100%);
+    background: linear-gradient(135deg, #0bb8cc 0%, #0bd1b6 100%);
   }
   
   /* 宝塔面板卡片 */
   .md-typeset .grid.cards:nth-of-type(1) > ul > li:nth-child(3) {
-    background: linear-gradient(135deg, #f26021 0%, #e83047 100%);
+    background: linear-gradient(135deg, #f27121 0%, #e94057 100%);
   }
   
   /* 集群部署卡片 */
   .md-typeset .grid.cards:nth-of-type(1) > ul > li:nth-child(4) {
-    background: linear-gradient(135deg, #5e3ea3 0%, #7852cf 100%);
+    background: linear-gradient(135deg, #654ea3 0%, #8862cf 100%);
   }
   
-  /* 文档卡片颜色设置 - 增强饱和度 */
+  /* 文档卡片颜色设置 */
   /* 维基百科卡片 */
   .md-typeset .grid.cards:nth-of-type(2) > ul > li:nth-child(1) {
-    background: linear-gradient(135deg, #6303c0 0%, #dc28bc 100%);
+    background: linear-gradient(135deg, #7303c0 0%, #ec38bc 100%);
   }
   
   /* 安装指南卡片 */
   .md-typeset .grid.cards:nth-of-type(2) > ul > li:nth-child(2) {
-    background: linear-gradient(135deg, #10898e 0%, #28df7d 100%);
+    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
   }
   
   /* 用户指南卡片 */
   .md-typeset .grid.cards:nth-of-type(2) > ul > li:nth-child(3) {
-    background: linear-gradient(135deg, #2a37d5 0%, #5d70fe 100%);
+    background: linear-gradient(135deg, #3a47d5 0%, #6d80fe 100%);
   }
   
   /* 接口文档卡片 */
   .md-typeset .grid.cards:nth-of-type(2) > ul > li:nth-child(4) {
-    background: linear-gradient(135deg, #00b6fb 0%, #004bea 100%);
+    background: linear-gradient(135deg, #00c6fb 0%, #005bea 100%);
   }
   
   /* 帮助支持卡片 */
   .md-typeset .grid.cards:nth-of-type(2) > ul > li:nth-child(5) {
-    background: linear-gradient(135deg, #128B22 0%, #22CD32 100%);
+    background: linear-gradient(135deg, #228B22 0%, #32CD32 100%);
   }
   
-  /* 卡片图标样式增强 */
-  .md-typeset .grid.cards > ul > li .twemoji {
-    font-size: 3.5em;
-    display: block;
-    margin: 0 auto 0.7em;
-    text-align: center;
-    filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.25));
-    transition: transform 0.3s ease, filter 0.3s ease;
-  }
-  
-  /* 卡片图标悬停效果增强 */
-  .md-typeset .grid.cards > ul > li:hover .twemoji {
-    transform: scale(1.15) rotate(5deg);
-    filter: drop-shadow(0 5px 10px rgba(0, 0, 0, 0.35));
-  }
-  
-  /* 卡片内标题文本样式增强 */
-  .md-typeset .grid.cards > ul > li p strong,
-  .md-typeset .grid.cards > ul > li strong {
-    color: white;
-    display: block;
-    margin-top: 0.5em;
-    margin-bottom: 0.3em;
-    font-size: 1.3em;
-    font-weight: 700;
-    letter-spacing: 0.02em;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  }
-  
-  /* 卡片链接按钮样式增强 */
-  .md-typeset .grid.cards > ul > li .more-link {
-    display: inline-flex;
-    align-items: center;
-    margin-top: 1.4em;
-    padding: 0.6em 1.4em;
-    color: white;
-    background-color: rgba(255, 255, 255, 0.18);
-    border-radius: 2em;
-    transition: all 0.3s ease;
-    font-weight: 500;
-    font-size: 0.95em;
-    letter-spacing: 0.03em;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-    position: relative;
-    overflow: hidden;
-  }
-  
-  /* 卡片链接按钮悬停效果增强 */
-  .md-typeset .grid.cards > ul > li .more-link:hover {
-    background-color: rgba(255, 255, 255, 0.28);
-    text-decoration: none;
-    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.25);
-    transform: translateX(6px);
-  }
-  
-  /* 增加页面内边距，让卡片更突出 */
-  .md-content__inner {
-    padding: 0 2rem 2rem;
-  }
-  
-  /* 保留其他原有样式 */
   /* 卡片纹理背景优化 */
   .md-typeset .grid.cards > ul > li {
     background-blend-mode: soft-light;
@@ -182,6 +140,19 @@ hide:
     letter-spacing: 0.01em;
   }
   
+  /* 卡片内标题文本样式 */
+  .md-typeset .grid.cards > ul > li p strong,
+  .md-typeset .grid.cards > ul > li strong {
+    color: white;
+    display: block;
+    margin-top: 0.5em;
+    margin-bottom: 0.3em;
+    font-size: 1.2em;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+  }
+  
   /* 卡片分隔线样式 */
   .md-typeset .grid.cards > ul > li hr {
     margin: 0.9em 0;
@@ -195,11 +166,53 @@ hide:
     );
   }
   
+  /* 卡片图标样式 */
+  .md-typeset .grid.cards > ul > li .twemoji {
+    font-size: 3.2em;
+    display: block;
+    margin: 0 auto 0.6em;
+    text-align: center;
+    filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.2));
+    transition: transform 0.3s ease, filter 0.3s ease;
+  }
+  
+  /* 卡片图标悬停效果 */
+  .md-typeset .grid.cards > ul > li:hover .twemoji {
+    transform: scale(1.1) rotate(5deg);
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+  }
+  
   /* 卡片标题居中 */
   .md-typeset .grid.cards > ul > li .title {
     text-align: center;
     font-weight: bold;
     margin-bottom: 0.5em;
+  }
+  
+  /* 卡片链接按钮样式 */
+  .md-typeset .grid.cards > ul > li .more-link {
+    display: inline-flex;
+    align-items: center;
+    margin-top: 1.2em;
+    padding: 0.5em 1.2em;
+    color: white;
+    background-color: rgba(255, 255, 255, 0.15);
+    border-radius: 2em;
+    transition: all 0.3s ease;
+    font-weight: 500;
+    font-size: 0.9em;
+    letter-spacing: 0.03em;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+    position: relative;
+    overflow: hidden;
+  }
+  
+  /* 卡片链接按钮悬停效果 */
+  .md-typeset .grid.cards > ul > li .more-link:hover {
+    background-color: rgba(255, 255, 255, 0.25);
+    text-decoration: none;
+    box-shadow: 0 5px 12px rgba(0, 0, 0, 0.2);
+    transform: translateX(5px);
   }
   
   /* 链接按钮箭头动画 */
@@ -230,26 +243,9 @@ hide:
     text-decoration-color: rgba(255, 255, 255, 0.8);
     text-shadow: 0 0 8px rgba(255, 255, 255, 0.4);
   }
-  
-  /* 卡片暗色遮罩优化 */
-  .md-typeset .grid.cards > ul > li:after {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: radial-gradient(circle at center, rgba(0, 0, 0, 0.05) 0%, rgba(0, 0, 0, 0.2) 100%);
-    pointer-events: none;
-    z-index: 1;
-  }
-  
-  /* 卡片内容层叠设置 */
-  .md-typeset .grid.cards > ul > li > * {
-    position: relative;
-    z-index: 3;
-  }
 </style>
+
+# 🚀 **开始使用**
 
 ## 🎯 **部署方式选择**
 
