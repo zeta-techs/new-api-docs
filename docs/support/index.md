@@ -101,7 +101,7 @@ hide:
 
     查看常见问题解答，快速解决您的疑惑：
     
-    - [问题解答 →](faq.md)
+    [问题解答 →](faq.md)
 
 -   :material-account-group:{ .twemoji }
 
@@ -111,7 +111,7 @@ hide:
 
     加入我们的社区，与其他用户交流：
     
-    - [QQ交流群 →](community-interaction.md)
+    [QQ交流群 →](community-interaction.md)
 
 -   :material-bug:{ .twemoji }
 
@@ -121,7 +121,7 @@ hide:
 
     遇到问题？向我们反馈：
     
-    - [提交问题 →](feedback-issues.md)
+    [提交问题 →](feedback-issues.md)
 
 -   :material-coffee:{ .twemoji }
 
@@ -131,7 +131,7 @@ hide:
 
     如果您觉得项目对您有帮助：
     
-    - [请我们喝咖啡 →](buy-us-a-coffee.md)
+    [请我们喝咖啡 →](buy-us-a-coffee.md)
 
 </div>
 

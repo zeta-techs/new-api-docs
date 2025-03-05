@@ -101,7 +101,7 @@ hide:
 
     最简单的单机部署方式：
     
-    - [查看教程 →](docker-installation.md)
+    [查看教程 →](docker-installation.md)
 
 -   :material-docker:{ .twemoji }
 
@@ -111,7 +111,7 @@ hide:
 
     推荐的单机部署方式：
     
-    - [查看教程 →](docker-compose-installation.md)
+    [查看教程 →](docker-compose-installation.md)
 
 -   :material-server:{ .twemoji }
 
@@ -121,7 +121,7 @@ hide:
 
     使用宝塔面板进行可视化部署：
     
-    - [查看教程 →](bt-docker-installation.md)
+    [查看教程 →](bt-docker-installation.md)
 
 -   :material-server-network:{ .twemoji }
 
@@ -131,7 +131,7 @@ hide:
 
     大规模部署的最佳选择：
     
-    - [查看教程 →](cluster-deployment.md)
+    [查看教程 →](cluster-deployment.md)
 
 </div>
 
@@ -147,7 +147,7 @@ hide:
 
     了解如何更新到最新版本：
     
-    - [查看说明 →](system-update.md)
+    [查看说明 →](system-update.md)
 
 -   :material-variable:{ .twemoji }
 
@@ -157,7 +157,7 @@ hide:
 
     所有可配置的环境变量说明：
     
-    - [查看文档 →](environment-variables.md)
+    [查看文档 →](environment-variables.md)
 
 -   :material-file-cog:{ .twemoji }
 
@@ -167,7 +167,7 @@ hide:
 
     Docker Compose 配置文件详解：
     
-    - [查看说明 →](docker-compose-yml.md)
+    [查看说明 →](docker-compose-yml.md)
 
 </div>
 

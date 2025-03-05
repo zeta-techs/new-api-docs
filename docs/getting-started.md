@@ -9,7 +9,7 @@ hide:
   /* 卡片容器样式优化 */
   .md-typeset .grid.cards > ul {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
     gap: 1.2rem;
     margin: 2em 0;
   }
