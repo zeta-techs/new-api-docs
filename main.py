@@ -1,8 +1,15 @@
 import json
 import re
 import urllib.request
+import urllib.parse
 from datetime import datetime
 import os
+
+# 自定义GitHub代理设置
+GITHUB_PROXY_CONFIG = {
+    "proxy": "https://api2.aimage.cc/proxy",  # 通用代理（适用于任何URL）
+    "enabled": True                           # 是否启用代理
+}
 
 def define_env(env):
     """
@@ -10,7 +17,7 @@ def define_env(env):
     """
     
     @env.macro
-    def get_github_releases(repo="Calcium-Ion/new-api", count=10):
+    def get_github_releases(repo="Calcium-Ion/new-api", count=10, use_proxy=True):
         """
         获取GitHub Releases数据并转换为Markdown
         """
@@ -31,17 +38,34 @@ def define_env(env):
                 with open(cache_file, 'r', encoding='utf-8') as f:
                     releases = json.load(f)
             else:
+                # 根据是否使用代理选择适当的API URL
+                if use_proxy and GITHUB_PROXY_CONFIG["enabled"]:
+                    # 使用通用代理方式
+                    original_api_url = f'https://api.github.com/repos/{repo}/releases?per_page={count}'
+                    # 直接传递原始URL，不进行编码
+                    api_url = f'{GITHUB_PROXY_CONFIG["proxy"]}?url={original_api_url}'
+                else:
+                    api_url = f'https://api.github.com/repos/{repo}/releases?per_page={count}'
+                
                 # 获取GitHub Releases数据
                 request = urllib.request.Request(
-                    f'https://api.github.com/repos/{repo}/releases?per_page={count}',
+                    api_url,
                     headers={'User-Agent': 'Mozilla/5.0'}
                 )
-                response = urllib.request.urlopen(request)
-                releases = json.loads(response.read().decode('utf-8'))
                 
-                # 保存到缓存
-                with open(cache_file, 'w', encoding='utf-8') as f:
-                    json.dump(releases, f)
+                try:
+                    response = urllib.request.urlopen(request)
+                    releases = json.loads(response.read().decode('utf-8'))
+                    
+                    # 保存到缓存
+                    with open(cache_file, 'w', encoding='utf-8') as f:
+                        json.dump(releases, f)
+                except urllib.error.URLError as e:
+                    # 如果代理访问失败，尝试直接访问
+                    if use_proxy and GITHUB_PROXY_CONFIG["enabled"]:
+                        return get_github_releases(repo, count, False)
+                    else:
+                        raise e
             
             # 生成原生Markdown格式
             markdown = ""
@@ -54,11 +78,30 @@ def define_env(env):
                 created_at = format_date(release.get('created_at', ''))
                 body = release.get('body', '')
                 
-                # 修复Markdown格式的图片链接
-                body = re.sub(r'!\[(.*?)\]\((.*?)\)', r'![\1](\2)', body)
-                
-                # 将HTML格式的图片转换为Markdown格式
-                body = re.sub(r'<img([^>]*)src="([^"]*)"([^>]*)>', r'![](\2)', body)
+                # 处理内容中的图片链接
+                if use_proxy and GITHUB_PROXY_CONFIG["enabled"]:
+                    # 替换Markdown格式的图片链接
+                    def replace_md_img(match):
+                        alt_text = match.group(1)
+                        img_url = match.group(2)
+                        return f'![{alt_text}]({GITHUB_PROXY_CONFIG["proxy"]}?url={img_url})'
+                    
+                    body = re.sub(r'!\[(.*?)\]\((https?://[^)]+)\)', replace_md_img, body)
+                    
+                    # 替换HTML格式的图片链接
+                    def replace_html_img(match):
+                        prefix = match.group(1)
+                        img_url = match.group(2)
+                        suffix = match.group(3)
+                        return f'<img{prefix}src="{GITHUB_PROXY_CONFIG["proxy"]}?url={img_url}"{suffix}>'
+                    
+                    body = re.sub(r'<img([^>]*)src="(https?://[^"]+)"([^>]*)>', replace_html_img, body)
+                else:
+                    # 修复Markdown格式的图片链接
+                    body = re.sub(r'!\[(.*?)\]\((.*?)\)', r'![\1](\2)', body)
+                    
+                    # 将HTML格式的图片转换为Markdown格式
+                    body = re.sub(r'<img([^>]*)src="([^"]*)"([^>]*)>', r'![](\2)', body)
                 
                 # 处理内容中的标题，将标题级别递增
                 # 依次处理6级到1级标题，避免重复替换
@@ -91,6 +134,10 @@ def define_env(env):
                     for asset in assets:
                         name = asset.get('name', '')
                         url = asset.get('browser_download_url', '')
+                        # 替换下载URL为代理URL
+                        if use_proxy and GITHUB_PROXY_CONFIG["enabled"] and 'github.com' in url:
+                            # 直接传递原始URL，不进行编码
+                            url = f'{GITHUB_PROXY_CONFIG["proxy"]}?url={url}'
                         size = format_file_size(asset.get('size', 0))
                         markdown += f'    - [{name}]({url}) ({size})\n'
                     markdown += '\n'
@@ -102,7 +149,7 @@ def define_env(env):
             return f'!!! error "错误"\n    获取GitHub Releases失败: {str(e)}\n'
     
     @env.macro
-    def get_github_contributors(repo="Calcium-Ion/new-api", count=100):
+    def get_github_contributors(repo="Calcium-Ion/new-api", count=100, use_proxy=True):
         """
         获取GitHub贡献者数据并转换为Markdown
         """
@@ -123,17 +170,34 @@ def define_env(env):
                 with open(cache_file, 'r', encoding='utf-8') as f:
                     contributors = json.load(f)
             else:
+                # 根据是否使用代理选择适当的API URL
+                if use_proxy and GITHUB_PROXY_CONFIG["enabled"]:
+                    # 使用通用代理方式
+                    original_api_url = f'https://api.github.com/repos/{repo}/contributors?per_page={count}'
+                    # 直接传递原始URL，不进行编码
+                    api_url = f'{GITHUB_PROXY_CONFIG["proxy"]}?url={original_api_url}'
+                else:
+                    api_url = f'https://api.github.com/repos/{repo}/contributors?per_page={count}'
+                
                 # 获取GitHub贡献者数据
                 request = urllib.request.Request(
-                    f'https://api.github.com/repos/{repo}/contributors?per_page={count}',
+                    api_url,
                     headers={'User-Agent': 'Mozilla/5.0'}
                 )
-                response = urllib.request.urlopen(request)
-                contributors = json.loads(response.read().decode('utf-8'))
                 
-                # 保存到缓存
-                with open(cache_file, 'w', encoding='utf-8') as f:
-                    json.dump(contributors, f)
+                try:
+                    response = urllib.request.urlopen(request)
+                    contributors = json.loads(response.read().decode('utf-8'))
+                    
+                    # 保存到缓存
+                    with open(cache_file, 'w', encoding='utf-8') as f:
+                        json.dump(contributors, f)
+                except urllib.error.URLError as e:
+                    # 如果代理访问失败，尝试直接访问
+                    if use_proxy and GITHUB_PROXY_CONFIG["enabled"]:
+                        return get_github_contributors(repo, count, False)
+                    else:
+                        raise e
             
             # 生成Markdown格式的贡献者列表
             markdown = ""
@@ -142,7 +206,15 @@ def define_env(env):
             for index, contributor in enumerate(contributors):
                 username = contributor.get('login', '')
                 avatar_url = contributor.get('avatar_url', '')
+                # 替换头像URL为代理URL - 使用通用代理方式
+                if use_proxy and GITHUB_PROXY_CONFIG["enabled"] and 'githubusercontent.com' in avatar_url:
+                    # 直接传递原始URL，不进行编码
+                    avatar_url = f'{GITHUB_PROXY_CONFIG["proxy"]}?url={avatar_url}'
                 profile_url = contributor.get('html_url', '')
+                # 替换个人主页URL为代理URL
+                if use_proxy and GITHUB_PROXY_CONFIG["enabled"] and 'github.com' in profile_url:
+                    # 直接传递原始URL，不进行编码
+                    profile_url = f'{GITHUB_PROXY_CONFIG["proxy"]}?url={profile_url}'
                 contributions = contributor.get('contributions', 0)
                 
                 # 获取前三名的特殊样式

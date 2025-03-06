@@ -2,26 +2,6 @@
 
 New API 的开发离不开社区的支持和贡献。在此特别感谢所有为项目提供帮助的个人和组织。
 
-## 💝 赞助商
-
-我们衷心感谢以下赞助商的慷慨支持，他们的贡献使得 New API 项目能够持续发展。
-
-!!! tip "成为赞助商"
-    如果您想支持 New API 的开发，请考虑[成为赞助商](https://github.com/sponsors/Calcium-Ion)。您的名字将会出现在这个页面上。
-
-<div class="sponsor-grid">
-  <div class="sponsor-card">
-    <a href="https://example.com" target="_blank">
-      <img src="https://example.com/logo.png" alt="赞助商名称">
-      <div class="sponsor-info">
-        <span class="sponsor-name">赞助商名称</span>
-        <span class="sponsor-tier">金牌赞助商</span>
-      </div>
-    </a>
-  </div>
- 
-</div>
-
 ## 👨‍💻 开发贡献者
 
 以下是所有为项目做出贡献的开发者列表。在此感谢他们的辛勤工作和创意！
