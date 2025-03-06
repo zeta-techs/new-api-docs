@@ -426,11 +426,14 @@ def define_env(env):
                     # 将HTML格式的图片转换为Markdown格式
                     body = re.sub(r'<img([^>]*)src="([^"]*)"([^>]*)>', r'![](\2)', body)
                 
-                # 处理内容中的标题，将标题级别递增
-                # 依次处理6级到1级标题，避免重复替换
-                for i in range(6, 0, -1):
+                # 处理内容中的标题，确保所有标题至少是三级标题
+                # 依次处理1级到6级标题，避免重复替换
+                for i in range(1, 7):
                     heading = '#' * i
-                    new_heading = '#' * (i + 1)
+                    # 确保内容中的标题至少是三级标题
+                    min_heading_level = 3
+                    new_level = max(i + 2, min_heading_level)  # 至少是三级标题
+                    new_heading = '#' * new_level
                     body = re.sub(f'^{heading} (.+?)$', f'{new_heading} \\1', body, flags=re.MULTILINE)
                 
                 # 版本号作为二级标题
