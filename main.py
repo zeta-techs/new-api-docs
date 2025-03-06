@@ -427,14 +427,34 @@ def define_env(env):
                     body = re.sub(r'<img([^>]*)src="([^"]*)"([^>]*)>', r'![](\2)', body)
                 
                 # 处理内容中的标题，确保所有标题至少是三级标题
-                # 依次处理1级到6级标题，避免重复替换
+                # 首先移除原始内容中可能存在的HTML标签
+                body = re.sub(r'<[^>]+>', '', body)
+                
+                # 预处理：统一处理Markdown标题格式
+                # 1. 移除每行开头和结尾的空白字符
+                body = re.sub(r'^\s+|\s+$', '', body, flags=re.MULTILINE)
+                
+                # 2. 确保标题前有空行（更好的分隔）
+                body = re.sub(r'([^\n])\n(#{1,6} )', r'\1\n\n\2', body)
+                
+                # 3. 处理标题：依次处理1级到6级标题
                 for i in range(1, 7):
                     heading = '#' * i
-                    # 确保内容中的标题至少是三级标题
-                    min_heading_level = 3
-                    new_level = max(i + 2, min_heading_level)  # 至少是三级标题
+                    
+                    # 改进的标题级别处理:
+                    # - 一级标题变为三级标题
+                    # - 其他标题只提升一级，但确保不超过最大级别
+                    if i == 1:
+                        new_level = 3  # 一级标题统一变为三级
+                    else:
+                        new_level = min(i + 1, 6)  # 其他标题提升一级，但不超过六级
+                        
                     new_heading = '#' * new_level
-                    body = re.sub(f'^{heading} (.+?)$', f'{new_heading} \\1', body, flags=re.MULTILINE)
+                    
+                    # 更强大的标题匹配模式，忽略行首空白，确保匹配标题后的空格和内容
+                    pattern = r'(^|\n)[ \t]*' + re.escape(heading) + r'[ \t]+(.+?)[ \t]*(\n|$)'
+                    replacement = r'\1' + new_heading + r' \2\3'
+                    body = re.sub(pattern, replacement, body)
                 
                 # 版本号作为二级标题
                 markdown += f'## {tag_name}\n\n'
