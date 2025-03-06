@@ -129,8 +129,9 @@ def define_env(env):
                 
                 # 添加资源下载部分（仍在admonition内部，但作为普通文本）
                 assets = release.get('assets', [])
-                if assets:
+                if assets or tag_name:
                     markdown += '    **下载资源**\n\n'
+                    # 添加正常资源
                     for asset in assets:
                         name = asset.get('name', '')
                         url = asset.get('browser_download_url', '')
@@ -140,6 +141,25 @@ def define_env(env):
                             url = f'{GITHUB_PROXY_CONFIG["proxy"]}?url={url}'
                         size = format_file_size(asset.get('size', 0))
                         markdown += f'    - [{name}]({url}) ({size})\n'
+                    
+                    # 在下载资源部分直接添加源代码下载链接
+                    if tag_name:
+                        # 构建zip下载链接
+                        zip_url = f'https://github.com/{repo}/archive/refs/tags/{tag_name}.zip'
+                        if use_proxy and GITHUB_PROXY_CONFIG["enabled"]:
+                            proxy_zip_url = f'{GITHUB_PROXY_CONFIG["proxy"]}?url={zip_url}'
+                            markdown += f'    - [Source code (zip)]({proxy_zip_url})\n'
+                        else:
+                            markdown += f'    - [Source code (zip)]({zip_url})\n'
+                        
+                        # 构建tar.gz下载链接
+                        tar_url = f'https://github.com/{repo}/archive/refs/tags/{tag_name}.tar.gz'
+                        if use_proxy and GITHUB_PROXY_CONFIG["enabled"]:
+                            proxy_tar_url = f'{GITHUB_PROXY_CONFIG["proxy"]}?url={tar_url}'
+                            markdown += f'    - [Source code (tar.gz)]({proxy_tar_url})\n'
+                        else:
+                            markdown += f'    - [Source code (tar.gz)]({tar_url})\n'
+                    
                     markdown += '\n'
                 
                 markdown += '---\n\n'
