@@ -21,6 +21,11 @@ class AppState:
         self.config_file = None
         self.keep_running = True
         self.last_check = {}  # 存储最后一次检查的时间
+        self.thread_running = False  # 标记线程是否已经在运行
+        self.rebuild_triggered = False  # 标记是否已触发重建
+        self.rebuild_cooldown = 0  # 重建冷却时间
+        self.api_failures = 0  # API失败计数
+        self.api_cooldown_until = 0  # API冷却时间
         
 app_state = AppState()
 
@@ -49,70 +54,111 @@ def get_data_hash(data):
     return hashlib.md5(json.dumps(data).encode()).hexdigest()
 
 def fetch_github_data(repo, data_type, count, use_proxy=True):
-    """获取GitHub数据，返回数据和是否成功的标志"""
+    """获取GitHub数据"""
     try:
-        # 根据数据类型确定API端点
+        # 检查API冷却时间
+        current_time = time.time()
+        if current_time < app_state.api_cooldown_until:
+            cooldown_remaining = int(app_state.api_cooldown_until - current_time)
+            print(f"[API] GitHub API冷却中，跳过请求 (剩余 {cooldown_remaining} 秒)")
+            return None, False
+            
+        # 构建API URL
         if data_type == "releases":
-            # 根据是否使用代理选择适当的API URL
-            if use_proxy and GITHUB_PROXY_CONFIG["enabled"]:
-                original_api_url = f'https://api.github.com/repos/{repo}/releases?per_page={count}'
-                api_url = f'{GITHUB_PROXY_CONFIG["proxy"]}?url={original_api_url}'
-            else:
-                api_url = f'https://api.github.com/repos/{repo}/releases?per_page={count}'
-            
-            # 获取GitHub Releases数据
-            request = urllib.request.Request(
-                api_url,
-                headers={'User-Agent': 'Mozilla/5.0'}
-            )
-            
-            response = urllib.request.urlopen(request)
-            return json.loads(response.read().decode('utf-8')), True
-            
+            api_path = f'repos/{repo}/releases?per_page={count}'
         elif data_type == "contributors":
-            # 初始化贡献者列表
-            contributors = []
-            page = 1
-            per_page = 100  # GitHub API 每页最多返回100个结果
+            api_path = f'repos/{repo}/contributors?per_page={count}'
+        else:
+            return None, False
             
-            # 循环获取所有页面的贡献者，直到达到请求的数量
-            while len(contributors) < count:
-                # 根据是否使用代理选择适当的API URL
-                if use_proxy and GITHUB_PROXY_CONFIG["enabled"]:
-                    original_api_url = f'https://api.github.com/repos/{repo}/contributors?per_page={per_page}&page={page}'
-                    api_url = f'{GITHUB_PROXY_CONFIG["proxy"]}?url={original_api_url}'
-                else:
-                    api_url = f'https://api.github.com/repos/{repo}/contributors?per_page={per_page}&page={page}'
-                
-                # 获取GitHub贡献者数据
-                request = urllib.request.Request(
-                    api_url,
-                    headers={'User-Agent': 'Mozilla/5.0'}
-                )
-                
-                response = urllib.request.urlopen(request)
-                page_contributors = json.loads(response.read().decode('utf-8'))
-                
-                # 如果返回的结果为空，说明已经没有更多贡献者了
-                if not page_contributors:
-                    break
-                
-                # 添加到总列表
-                contributors.extend(page_contributors)
-                
-                # 增加页码
-                page += 1
+        # 根据是否使用代理选择适当的API URL
+        if use_proxy and GITHUB_PROXY_CONFIG["enabled"]:
+            # 使用通用代理方式
+            original_api_url = f'https://api.github.com/{api_path}'
+            # 直接传递原始URL，不进行编码
+            api_url = f'{GITHUB_PROXY_CONFIG["proxy"]}?url={original_api_url}'
+        else:
+            api_url = f'https://api.github.com/{api_path}'
+        
+        # 获取GitHub数据
+        request = urllib.request.Request(
+            api_url,
+            headers={'User-Agent': 'Mozilla/5.0'}
+        )
+        
+        try:
+            response = urllib.request.urlopen(request)
+            data = json.loads(response.read().decode('utf-8'))
             
-            # 限制贡献者数量为请求的数量
-            contributors = contributors[:count]
-            return contributors, True
+            # 成功获取数据，重置失败计数
+            app_state.api_failures = 0
             
-        return None, False
+            # 处理分页数据（如果需要）
+            if data_type == "contributors" and len(data) < count and len(data) > 0:
+                # 如果是贡献者数据，且返回的数量小于请求的数量，尝试获取下一页
+                all_data = data.copy()
+                page = 2
+                
+                # 最多获取5页数据，避免过多请求
+                while len(all_data) < count and page <= 5:
+                    # 构建下一页URL
+                    if use_proxy and GITHUB_PROXY_CONFIG["enabled"]:
+                        next_api_url = f'https://api.github.com/{api_path}&page={page}'
+                        next_url = f'{GITHUB_PROXY_CONFIG["proxy"]}?url={next_api_url}'
+                    else:
+                        next_url = f'https://api.github.com/{api_path}&page={page}'
+                    
+                    next_request = urllib.request.Request(
+                        next_url,
+                        headers={'User-Agent': 'Mozilla/5.0'}
+                    )
+                    
+                    next_response = urllib.request.urlopen(next_request)
+                    next_data = json.loads(next_response.read().decode('utf-8'))
+                    
+                    # 如果没有更多数据，退出循环
+                    if not next_data:
+                        break
+                        
+                    all_data.extend(next_data)
+                    page += 1
+                    
+                    # 添加短暂延迟，避免触发GitHub API限制
+                    time.sleep(1)
+                
+                # 限制返回的数据数量
+                return all_data[:count], True
+            
+            return data, True
+        except urllib.error.HTTPError as e:
+            # 处理HTTP错误
+            print(f"获取GitHub数据失败: HTTP Error {e.code}: {e.reason}")
+            
+            # 如果是限速错误，设置较长的冷却时间
+            if e.code == 403 and "rate limit exceeded" in str(e.reason).lower():
+                app_state.api_failures += 1
+                cooldown_time = 60 * (2 ** min(app_state.api_failures, 6))  # 指数退避，最多64分钟
+                app_state.api_cooldown_until = current_time + cooldown_time
+                print(f"[API] GitHub API限速，设置冷却时间 {cooldown_time} 秒")
+            
+            # 如果代理访问失败，尝试直接访问
+            if use_proxy and GITHUB_PROXY_CONFIG["enabled"]:
+                print("[API] 代理访问失败，尝试直接访问")
+                return fetch_github_data(repo, data_type, count, False)
+            
+            return None, False
+        except Exception as e:
+            print(f"获取GitHub数据失败: {str(e)}")
+            
+            # 增加失败计数和冷却时间
+            app_state.api_failures += 1
+            cooldown_time = 30 * app_state.api_failures  # 线性增加冷却时间
+            app_state.api_cooldown_until = current_time + cooldown_time
+            print(f"[API] 设置API冷却时间 {cooldown_time} 秒")
+            
+            return None, False
     except Exception as e:
         print(f"获取GitHub数据失败: {str(e)}")
-        # 如果代理访问失败，尝试直接访问
-        if use_proxy and GITHUB_PROXY_CONFIG["enabled"]:
-            return fetch_github_data(repo, data_type, count, False)
         return None, False
 
 def check_and_update_cache(repo, data_type, count):
@@ -123,9 +169,9 @@ def check_and_update_cache(repo, data_type, count):
     
     cache_key = f"{repo}_{data_type}_{count}"
     
-    # 如果在过去5分钟内检查过，则跳过
+    # 如果在过去30分钟内检查过，则跳过
     now = time.time()
-    if cache_key in app_state.last_check and now - app_state.last_check[cache_key] < 300:
+    if cache_key in app_state.last_check and now - app_state.last_check[cache_key] < 1800:  # 30分钟
         return False
     
     app_state.last_check[cache_key] = now
@@ -164,10 +210,25 @@ def check_and_update_cache(repo, data_type, count):
 def trigger_mkdocs_rebuild():
     """触发MkDocs重新构建"""
     try:
+        # 如果在冷却期内，跳过触发
+        current_time = time.time()
+        if current_time < app_state.rebuild_cooldown:
+            print(f"[rebuild] 重建冷却中，跳过触发 (剩余 {int(app_state.rebuild_cooldown - current_time)} 秒)")
+            return False
+            
+        # 如果已经触发过重建，跳过
+        if app_state.rebuild_triggered:
+            print("[rebuild] 已经触发过重建，跳过")
+            return False
+            
         # 确保有配置文件路径
         if not app_state.config_file or not os.path.exists(app_state.config_file):
             print("[rebuild] 未找到配置文件，无法触发重建")
             return False
+        
+        # 设置重建标记和冷却时间
+        app_state.rebuild_triggered = True
+        app_state.rebuild_cooldown = current_time + 60  # 60秒冷却时间
         
         # 方法一：通过修改 mkdocs.yml 时间戳触发重建
         print(f"[rebuild] 正在触发MkDocs重建...")
@@ -188,6 +249,13 @@ def trigger_mkdocs_rebuild():
                     break
         
         print("[rebuild] MkDocs重建已触发")
+        
+        # 5秒后重置触发标记
+        def reset_trigger():
+            time.sleep(5)
+            app_state.rebuild_triggered = False
+            
+        threading.Thread(target=reset_trigger, daemon=True).start()
         return True
     except Exception as e:
         print(f"[rebuild] 触发MkDocs重建失败: {str(e)}")
@@ -221,7 +289,7 @@ def fetch_and_update_cache(repo, data_type, count):
 
 def auto_refresh_worker():
     """自动刷新工作线程"""
-    refresh_interval = 300  # 10秒检查一次 (开发期间用10秒，正式使用可改回300秒)
+    refresh_interval = 300  # 5分钟检查一次
     last_full_refresh = time.time()
     
     print("[auto_refresh] 自动刷新线程已启动")
@@ -230,8 +298,8 @@ def auto_refresh_worker():
         try:
             current_time = time.time()
             
-            # 每小时执行一次全量刷新
-            force_refresh = (current_time - last_full_refresh) >= 3600
+            # 每12小时执行一次全量刷新
+            force_refresh = (current_time - last_full_refresh) >= 43200  # 12小时
             if force_refresh:
                 last_full_refresh = current_time
                 print("[auto_refresh] 执行全量缓存刷新")
@@ -255,6 +323,8 @@ def auto_refresh_worker():
                         try:
                             print(f"[auto_refresh] 创建默认缓存: {repo}, {data_type}, {count}")
                             fetch_and_update_cache(repo, data_type, count)
+                            # 添加延迟，避免触发GitHub API限制
+                            time.sleep(5)
                         except Exception as e:
                             print(f"[auto_refresh] 创建默认缓存失败: {repo}, {data_type}, {count}, 错误: {str(e)}")
                     
@@ -262,7 +332,11 @@ def auto_refresh_worker():
                     cache_files = [f for f in os.listdir(app_state.cache_dir) if f.endswith('.json')]
                     print(f"[auto_refresh] 创建默认缓存后找到 {len(cache_files)} 个缓存文件")
                 
-                for filename in cache_files:
+                # 限制每次检查的文件数量，避免过多API请求
+                max_files_per_check = 2
+                files_to_check = cache_files[:max_files_per_check]
+                
+                for filename in files_to_check:
                     try:
                         # 从文件名解析信息
                         parts = filename.replace('.json', '').split('_')
@@ -280,6 +354,9 @@ def auto_refresh_worker():
                             else:
                                 # 正常检查缓存
                                 check_and_update_cache(repo, data_type, count)
+                                
+                            # 添加延迟，避免触发GitHub API限制
+                            time.sleep(5)
                     except Exception as e:
                         print(f"[auto_refresh] 处理缓存文件 {filename} 时出错: {str(e)}")
             else:
@@ -317,17 +394,26 @@ def define_env(env):
     try:
         # 检查常用的缓存
         print("[macros] 执行初始缓存检查")
-        fetch_and_update_cache("Calcium-Ion/new-api", "releases", 30)
-        fetch_and_update_cache("Calcium-Ion/new-api", "contributors", 50)
+        
+        # 如果缓存目录为空，创建默认缓存
+        cache_files = [f for f in os.listdir(app_state.cache_dir) if f.endswith('.json')]
+        if len(cache_files) == 0:
+            fetch_and_update_cache("Calcium-Ion/new-api", "releases", 30)
+            time.sleep(2)  # 添加短暂延迟
+            fetch_and_update_cache("Calcium-Ion/new-api", "contributors", 50)
     except Exception as e:
         print(f"[macros] 初始缓存检查失败: {str(e)}")
     
-    # 启动自动刷新线程
+    # 启动自动刷新线程（如果尚未启动）
     try:
-        print("[macros] 启动自动刷新线程")
-        refresh_thread = threading.Thread(target=auto_refresh_worker, daemon=True)
-        refresh_thread.start()
-        print("[macros] 自动刷新线程已启动")
+        if not app_state.thread_running:
+            print("[macros] 启动自动刷新线程")
+            app_state.thread_running = True
+            refresh_thread = threading.Thread(target=auto_refresh_worker, daemon=True)
+            refresh_thread.start()
+            print("[macros] 自动刷新线程已启动")
+        else:
+            print("[macros] 自动刷新线程已在运行，跳过启动")
     except Exception as e:
         print(f"[macros] 启动自动刷新线程失败: {str(e)}")
     
@@ -355,8 +441,8 @@ def define_env(env):
                 # 如果缓存不存在，立即获取新数据
                 releases, success = fetch_github_data(repo, "releases", count, use_proxy)
                 if not success or not releases:
-                    print("[macro] 获取数据失败")
-                    return f'!!! error "错误"\n    获取GitHub Releases失败，请稍后再试\n'
+                    print("[macro] 获取数据失败，返回错误信息")
+                    return f'!!! error "数据暂时不可用"\n    GitHub Releases数据暂时不可用，请稍后再试。\n    如果问题持续存在，请联系管理员。\n'
                 
                 # 保存到缓存
                 if cache_file:
@@ -364,12 +450,13 @@ def define_env(env):
                         json.dump(releases, f)
                     print(f"[macro] 已创建缓存: {cache_file}")
             else:
-                # 检查缓存是否过期（1小时）
+                # 检查缓存是否过期（24小时）
                 file_mtime = os.path.getmtime(cache_file)
                 cache_age = time.time() - file_mtime
-                print(f"[macro] 缓存已存在，缓存年龄: {cache_age:.0f}秒")
+                print(f"[macro] 缓存已存在，缓存年龄: {int(cache_age)}秒")
                 
-                if cache_age > 3600:  # 1小时缓存
+                # 如果缓存过期，在后台触发更新，但仍使用现有缓存
+                if cache_age > 86400:  # 24小时
                     print("[macro] 缓存已过期，触发后台更新")
                     # 触发后台异步更新，但不等待结果
                     threading.Thread(
@@ -379,9 +466,13 @@ def define_env(env):
                     ).start()
             
             # 从缓存读取数据
-            with open(cache_file, 'r', encoding='utf-8') as f:
-                releases = json.load(f)
-                print(f"[macro] 从缓存加载了 {len(releases)} 个发布")
+            try:
+                with open(cache_file, 'r', encoding='utf-8') as f:
+                    releases = json.load(f)
+                    print(f"[macro] 从缓存加载了 {len(releases)} 个发布")
+            except Exception as e:
+                print(f"[macro] 读取缓存失败: {str(e)}，返回错误信息")
+                return f'!!! error "缓存读取失败"\n    无法读取GitHub Releases缓存数据，请稍后再试。\n    错误详情: {str(e)}\n'
             
             # 获取缓存更新时间
             cache_update_time = datetime.fromtimestamp(os.path.getmtime(cache_file)) if cache_file and os.path.exists(cache_file) else datetime.now()
@@ -391,7 +482,7 @@ def define_env(env):
             
             # 添加缓存状态信息 - 使用MkDocs原生的Admonition格式
             markdown += f'!!! note "数据信息"\n'
-            markdown += f'    数据更新于: {cache_update_time.strftime("%Y-%m-%d %H:%M:%S")}\n\n'
+            markdown += f'    数据更新于: {cache_update_time.strftime("%Y-%m-%d %H:%M:%S")} (每30分钟自动检查更新)\n\n'
             
             # 遍历发布版本
             for index, release in enumerate(releases):
@@ -531,8 +622,8 @@ def define_env(env):
                 # 如果缓存不存在，立即获取新数据
                 contributors, success = fetch_github_data(repo, "contributors", count, use_proxy)
                 if not success or not contributors:
-                    print("[macro] 获取数据失败")
-                    return f'!!! error "错误"\n    获取GitHub贡献者失败，请稍后再试\n'
+                    print("[macro] 获取数据失败，返回错误信息")
+                    return f'!!! error "数据暂时不可用"\n    GitHub贡献者数据暂时不可用，请稍后再试。\n    如果问题持续存在，请联系管理员。\n'
                 
                 # 保存到缓存
                 if cache_file:
@@ -540,12 +631,13 @@ def define_env(env):
                         json.dump(contributors, f)
                     print(f"[macro] 已创建缓存: {cache_file}")
             else:
-                # 检查缓存是否过期（1小时）
+                # 检查缓存是否过期（24小时）
                 file_mtime = os.path.getmtime(cache_file)
                 cache_age = time.time() - file_mtime
-                print(f"[macro] 缓存已存在，缓存年龄: {cache_age:.0f}秒")
+                print(f"[macro] 缓存已存在，缓存年龄: {int(cache_age)}秒")
                 
-                if cache_age > 3600:  # 1小时缓存
+                # 如果缓存过期，在后台触发更新，但仍使用现有缓存
+                if cache_age > 86400:  # 24小时
                     print("[macro] 缓存已过期，触发后台更新")
                     # 触发后台异步更新，但不等待结果
                     threading.Thread(
@@ -555,9 +647,13 @@ def define_env(env):
                     ).start()
             
             # 从缓存读取数据
-            with open(cache_file, 'r', encoding='utf-8') as f:
-                contributors = json.load(f)
-                print(f"[macro] 从缓存加载了 {len(contributors)} 个贡献者")
+            try:
+                with open(cache_file, 'r', encoding='utf-8') as f:
+                    contributors = json.load(f)
+                    print(f"[macro] 从缓存加载了 {len(contributors)} 个贡献者")
+            except Exception as e:
+                print(f"[macro] 读取缓存失败: {str(e)}，返回错误信息")
+                return f'!!! error "缓存读取失败"\n    无法读取GitHub贡献者缓存数据，请稍后再试。\n    错误详情: {str(e)}\n'
             
             # 获取缓存更新时间
             cache_update_time = datetime.fromtimestamp(os.path.getmtime(cache_file)) if cache_file and os.path.exists(cache_file) else datetime.now()
@@ -567,7 +663,7 @@ def define_env(env):
             
             # 添加缓存状态信息 - 使用MkDocs原生的Admonition格式
             markdown += f'!!! note "数据信息"\n'
-            markdown += f'    数据更新于: {cache_update_time.strftime("%Y-%m-%d %H:%M:%S")}\n\n'
+            markdown += f'    数据更新于: {cache_update_time.strftime("%Y-%m-%d %H:%M:%S")} (每30分钟自动检查更新)\n\n'
             
             # 为每个贡献者创建三级标题和简单信息
             for index, contributor in enumerate(contributors):
