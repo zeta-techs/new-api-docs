@@ -7,7 +7,6 @@ import os
 import time
 import threading
 import hashlib
-import webbrowser
 
 # 自定义GitHub代理设置
 GITHUB_PROXY_CONFIG = {
@@ -392,7 +391,7 @@ def define_env(env):
             
             # 添加缓存状态信息 - 使用MkDocs原生的Admonition格式
             markdown += f'!!! note "数据信息"\n'
-            markdown += f'    数据更新于: {cache_update_time.strftime("%Y-%m-%d %H:%M:%S")} (每30分钟自动检查更新)\n\n'
+            markdown += f'    数据更新于: {cache_update_time.strftime("%Y-%m-%d %H:%M:%S")}\n\n'
             
             # 遍历发布版本
             for index, release in enumerate(releases):
@@ -545,7 +544,7 @@ def define_env(env):
             
             # 添加缓存状态信息 - 使用MkDocs原生的Admonition格式
             markdown += f'!!! note "数据信息"\n'
-            markdown += f'    数据更新于: {cache_update_time.strftime("%Y-%m-%d %H:%M:%S")} (每30分钟自动检查更新)\n\n'
+            markdown += f'    数据更新于: {cache_update_time.strftime("%Y-%m-%d %H:%M:%S")}\n\n'
             
             # 为每个贡献者创建三级标题和简单信息
             for index, contributor in enumerate(contributors):
