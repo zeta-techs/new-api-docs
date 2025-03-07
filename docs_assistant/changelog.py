@@ -37,12 +37,14 @@ def format_releases_markdown(releases_data):
         else:
             formatted_date = '未知时间'
         
-        # 处理Markdown格式标题级别
-        body = re.sub(r'^#\s+', '### ', body, flags=re.MULTILINE)
-        body = re.sub(r'^##\s+', '### ', body, flags=re.MULTILINE)
-        body = re.sub(r'^###\s+', '#### ', body, flags=re.MULTILINE)
-        body = re.sub(r'^####\s+', '##### ', body, flags=re.MULTILINE)
-        body = re.sub(r'^#####\s+', '###### ', body, flags=re.MULTILINE)
+        # 处理Markdown格式标题级别 - 从最高级别开始处理，避免多次替换
+        # 先处理高级别标题再处理低级别标题，避免标题被多次降级
+        body = re.sub(r'^######\s+', '###### ', body, flags=re.MULTILINE)  # 六级标题保持不变
+        body = re.sub(r'^#####\s+', '###### ', body, flags=re.MULTILINE)   # 五级标题降为六级
+        body = re.sub(r'^####\s+', '##### ', body, flags=re.MULTILINE)     # 四级标题降为五级
+        body = re.sub(r'^###\s+', '#### ', body, flags=re.MULTILINE)       # 三级标题降为四级
+        body = re.sub(r'^##\s+', '### ', body, flags=re.MULTILINE)         # 二级标题降为三级
+        body = re.sub(r'^#\s+', '### ', body, flags=re.MULTILINE)          # 一级标题降为三级
         
         # 替换图片链接（如果使用代理）
         if USE_PROXY:
