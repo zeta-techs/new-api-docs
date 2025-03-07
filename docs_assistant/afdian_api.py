@@ -106,6 +106,8 @@ def classify_sponsors(sponsors):
     铜牌: 0-1000元
     银牌: 1001-10000元
     金牌: 10001元以上
+    
+    注意：排除all_sum_amount为0的赞助者，这些可能是退款或使用了兑换码
     """
     bronze_sponsors = []  # 铜牌赞助商 (0-1000元)
     silver_sponsors = []  # 银牌赞助商 (1001-10000元)
@@ -118,6 +120,11 @@ def classify_sponsors(sponsors):
         except (ValueError, TypeError):
             # 如果金额不是有效数字，设为0
             amount = 0.0
+        
+        # 跳过金额为0的赞助者（可能是退款或使用了兑换码）
+        if amount <= 0:
+            logger.info(f"跳过金额为0的赞助者: {sponsor.get('user', {}).get('name', '未知赞助者')}")
+            continue
         
         # 按金额分类
         sponsor_info = {
