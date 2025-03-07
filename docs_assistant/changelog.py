@@ -37,8 +37,12 @@ def format_releases_markdown(releases_data):
         else:
             formatted_date = '未知时间'
         
-        # 处理Markdown格式
-        body = body.replace('# ', '### ').replace('## ', '### ').replace('### ', '#### ').replace('#### ', '##### ').replace('##### ', '###### ').replace('###### ', '###### ')
+        # 处理Markdown格式标题级别
+        body = re.sub(r'^#\s+', '### ', body, flags=re.MULTILINE)
+        body = re.sub(r'^##\s+', '### ', body, flags=re.MULTILINE)
+        body = re.sub(r'^###\s+', '#### ', body, flags=re.MULTILINE)
+        body = re.sub(r'^####\s+', '##### ', body, flags=re.MULTILINE)
+        body = re.sub(r'^#####\s+', '###### ', body, flags=re.MULTILINE)
         
         # 替换图片链接（如果使用代理）
         if USE_PROXY:
