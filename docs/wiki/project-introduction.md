@@ -3,7 +3,7 @@
 
   <strong style="font-size: 1.5em">New API</strong>
 
-  <a href="../assets/trendshift.svg" target="_blank"><img src="https://trendshift.io/api/badge/repositories/8227" alt="Calcium-Ion%2Fnew-api | Trendshift" style="width: 250px; height: 55px;" width="250" height="55"/></a>
+  <img src="../assets/trendshift.svg" alt="NewAPI_Trendshift" style="width: 250px; height: 55px;" width="250" height="55"/>
 
 </div>
 
