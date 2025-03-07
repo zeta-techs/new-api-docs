@@ -50,7 +50,7 @@ New API 是一个新一代大模型网关与 AI 资产管理系统，基于 [One
 ## 📊 项目统计
 
 <div class="text-center" markdown>
-[![Star History Chart](https://api.star-history.com/svg?repos=Calcium-Ion/new-api&type=Date)](../assets/star-history-2025223.png)
+![Star History Chart](../assets/star-history-2025223.png)
 </div>
 
 ## 📜 许可证

@@ -326,8 +326,8 @@ def format_sponsors_markdown(sponsors_data):
 }
 
 .sponsor-avatar-small {
-    width: 50px;
-    height: 50px;
+    width: 50px !important;
+    height: 50px !important;
     border-radius: 50%;
     object-fit: cover;
     border: 2px solid #cd7f32;
