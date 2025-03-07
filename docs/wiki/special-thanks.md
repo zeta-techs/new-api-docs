@@ -7,4 +7,4 @@ New API 的开发离不开社区的支持和贡献。在此特别感谢所有为
 !!! info "贡献者信息"
     以下贡献者数据从 [GitHub Contributors 页面](https://github.com/Calcium-Ion/new-api/graphs/contributors) 自动获取前50名。贡献度前三名分别以金、银、铜牌边框标识。如果您也想为项目做出贡献，欢迎提交 Pull Request。
 
-{{ get_github_contributors() }}
+> 贡献者数据正在更新中，请稍后查看...
