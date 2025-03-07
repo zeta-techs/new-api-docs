@@ -36,14 +36,14 @@ def main():
         try:
             current_time = time.time()
             
-            # 检查是否需要更新贡献者列表
+            # 检查是否需要更新贡献者和赞助商列表
             if current_time - last_update['contributors'] >= update_intervals['contributors']:
-                logger.info("开始更新贡献者列表")
+                logger.info("开始更新贡献者和赞助商列表")
                 if update_special_thanks_file():
                     last_update['contributors'] = current_time
-                    logger.info("贡献者列表更新成功")
+                    logger.info("贡献者和赞助商列表更新成功")
                 else:
-                    logger.warning("贡献者列表更新失败，将在下次更新周期重试")
+                    logger.warning("贡献者和赞助商列表更新失败，将在下次更新周期重试")
             
             # 检查是否需要更新发布日志
             if current_time - last_update['releases'] >= update_intervals['releases']:

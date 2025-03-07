@@ -29,6 +29,8 @@ services:
       - DOCS_DIR=/app/docs
       - USE_PROXY=false
       - GITHUB_PROXY=https://api2.aimage.cc/proxy
+      - AFDIAN_USER_ID=
+      - AFDIAN_TOKEN=
       - TZ=Asia/Shanghai
     networks:
       - docs-network
