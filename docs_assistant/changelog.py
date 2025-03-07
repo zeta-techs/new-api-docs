@@ -38,7 +38,7 @@ def format_releases_markdown(releases_data):
             formatted_date = '未知时间'
         
         # 处理Markdown格式
-        body = body.replace('### ', '#### ').replace('## ', '### ')
+        body = body.replace('# ', '### ').replace('## ', '### ').replace('### ', '#### ').replace('#### ', '##### ').replace('##### ', '###### ').replace('###### ', '###### ')
         
         # 替换图片链接（如果使用代理）
         if USE_PROXY:
