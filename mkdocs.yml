@@ -151,7 +151,6 @@ plugins:
       separator: '[\s\u200b\-_,:!=\[\]()"`/]+|\.(?!\d)|&[lg]t;|(?!\b)(?=[A-Z][a-z])'
   # - social
   - tags
-  - macros
   # - minify:
   #     minify_html: true
 
@@ -191,8 +190,6 @@ markdown_extensions:
   - pymdownx.tasklist:
       custom_checkbox: true
   - pymdownx.tilde
-  - tables
-  - meta
 
 # copyright: Copyright &copy; 2025 Quantum Nous. All Rights Reserved. 量子智元公司 版权所有
 copyright: Copyright &copy; 2025 New API. All Rights Reserved.
@@ -213,4 +210,3 @@ extra:
     cookies:
       analytics: Google Analytics
   generator: false
-  github_repo: Calcium-Ion/new-api
