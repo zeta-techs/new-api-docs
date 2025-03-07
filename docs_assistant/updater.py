@@ -1,13 +1,9 @@
 import os
 import json
 import time
-import hashlib
 import requests
 import logging
 from datetime import datetime
-import yaml
-import re
-import threading
 
 # 配置日志
 logging.basicConfig(
@@ -23,155 +19,94 @@ GITHUB_PROXY = os.environ.get('GITHUB_PROXY', 'https://api2.aimage.cc/proxy')
 USE_PROXY = os.environ.get('USE_PROXY', 'true').lower() == 'true'
 DOCS_DIR = os.environ.get('DOCS_DIR', '/app/docs')
 
-# 全局状态
-class AppState:
-    def __init__(self):
-        self.api_failures = 0  # API失败计数
-        self.api_cooldown_until = 0  # API冷却时间
-        self.rebuild_cooldown = 0  # 重建冷却时间
-        self.rebuild_triggered = False  # 标记是否已触发重建
-        
-app_state = AppState()
+# GitHub API限制相关参数
+MAX_RETRY_ATTEMPTS = 3
+RATE_LIMIT_WAIT_TIME = 60  # 触发限制后等待的秒数
 
 def fetch_github_data(repo, data_type, count, use_proxy=True):
-    """获取GitHub数据"""
+    """获取GitHub数据，智能处理API限制，参数：
+    repo: GitHub仓库 (例如："username/repo")
+    data_type: 数据类型 ("releases" 或 "contributors")
+    count: 最大获取数量
+    use_proxy: 是否使用代理
+    """
     logger.info(f"获取GitHub数据: {repo}, {data_type}, count={count}")
     
     headers = {'User-Agent': 'Mozilla/5.0 DocUpdater/1.0'}
     
-    try:
-        # 检查API冷却时间
-        current_time = time.time()
-        if current_time < app_state.api_cooldown_until:
-            cooldown_remaining = int(app_state.api_cooldown_until - current_time)
-            logger.info(f"GitHub API冷却中，跳过请求 (剩余 {cooldown_remaining} 秒)")
-            return None, False
+    for attempt in range(MAX_RETRY_ATTEMPTS):
+        try:
+            # 构建API路径
+            if data_type == "releases":
+                api_path = f'repos/{repo}/releases?per_page={count}'
+            elif data_type == "contributors":
+                api_path = f'repos/{repo}/contributors?per_page={count}'
+            else:
+                return None, False
             
-        # 构建API路径
-        if data_type == "releases":
-            api_path = f'repos/{repo}/releases?per_page={count}'
-        elif data_type == "contributors":
-            api_path = f'repos/{repo}/contributors?per_page={count}'
-        else:
-            return None, False
-        
-        # 构建API URL
-        if use_proxy and USE_PROXY:
-            original_api_url = f'https://api.github.com/{api_path}'
-            api_url = f'{GITHUB_PROXY}?url={original_api_url}'
-        else:
-            api_url = f'https://api.github.com/{api_path}'
-        
-        # 发送请求
-        response = requests.get(api_url, headers=headers, timeout=30)
-        response.raise_for_status()
-        data = response.json()
-        
-        # 成功获取数据，重置失败计数
-        app_state.api_failures = 0
-        
-        # 处理分页 (如果需要)
-        if data_type == "contributors" and len(data) < count and len(data) > 0:
-            all_data = data.copy()
-            page = 2
+            # 构建API URL
+            if use_proxy and USE_PROXY:
+                original_api_url = f'https://api.github.com/{api_path}'
+                api_url = f'{GITHUB_PROXY}?url={original_api_url}'
+            else:
+                api_url = f'https://api.github.com/{api_path}'
             
-            # 最多获取5页
-            while len(all_data) < count and page <= 5:
-                # 构建下一页URL
-                next_api_url = f'{api_path}&page={page}'
-                if use_proxy and USE_PROXY:
-                    next_url = f'{GITHUB_PROXY}?url=https://api.github.com/{next_api_url}'
-                else:
-                    next_url = f'https://api.github.com/{next_api_url}'
+            # 发送请求
+            response = requests.get(api_url, headers=headers, timeout=30)
+            
+            # 检查API限制
+            if response.status_code == 403 and 'rate limit exceeded' in response.text.lower():
+                logger.warning(f"GitHub API限制已达到，等待{RATE_LIMIT_WAIT_TIME}秒后重试...")
+                time.sleep(RATE_LIMIT_WAIT_TIME)
+                continue
                 
-                next_response = requests.get(next_url, headers=headers, timeout=30)
-                next_response.raise_for_status()
-                next_data = next_response.json()
+            response.raise_for_status()
+            data = response.json()
+            
+            # 处理分页 (仅适用于贡献者数据)
+            if data_type == "contributors" and len(data) < count and len(data) > 0:
+                all_data = data.copy()
+                page = 2
                 
-                if not next_data:
-                    break
+                # 最多获取3页，避免触发API限制
+                while len(all_data) < count and page <= 3:
+                    # 等待1秒避免请求过快
+                    time.sleep(1)
                     
-                all_data.extend(next_data)
-                page += 1
-                time.sleep(1)  # 避免触发限制
-            
-            return all_data[:count], True
-        
-        return data, True
-    
-    except requests.exceptions.RequestException as e:
-        logger.error(f"API请求失败: {str(e)}")
-        
-        # 处理限速错误
-        if hasattr(e, 'response') and e.response and e.response.status_code == 403 and "rate limit exceeded" in str(e.response.text).lower():
-            app_state.api_failures += 1
-            cooldown_time = 60 * (2 ** min(app_state.api_failures, 6))  # 指数退避，最多64分钟
-            app_state.api_cooldown_until = time.time() + cooldown_time
-            logger.warning(f"GitHub API限速，设置冷却时间 {cooldown_time} 秒")
-        
-        # 如果代理失败，尝试直接访问
-        if use_proxy and USE_PROXY:
-            logger.info("代理请求失败，尝试直接访问")
-            return fetch_github_data(repo, data_type, count, False)
-        
-        return None, False
-    except Exception as e:
-        logger.error(f"获取数据时出错: {str(e)}")
-        
-        # 增加失败计数和冷却时间
-        app_state.api_failures += 1
-        cooldown_time = 30 * app_state.api_failures  # 线性增加冷却时间
-        app_state.api_cooldown_until = time.time() + cooldown_time
-        logger.warning(f"设置API冷却时间 {cooldown_time} 秒")
-        
-        return None, False
-
-def update_mkdocs_timestamp():
-    """更新MkDocs配置文件时间戳，触发重建"""
-    current_time = time.time()
-    if current_time < app_state.rebuild_cooldown:
-        logger.info(f"重建冷却中，跳过触发 (剩余 {int(app_state.rebuild_cooldown - current_time)} 秒)")
-        return False
-        
-    if app_state.rebuild_triggered:
-        logger.info("已经触发过重建，跳过")
-        return False
-        
-    try:
-        # 查找MkDocs配置文件
-        config_file = os.path.join(DOCS_DIR, 'mkdocs.yml')
-        if os.path.exists(config_file):
-            # 设置重建标记和冷却时间
-            app_state.rebuild_triggered = True
-            app_state.rebuild_cooldown = current_time + 60  # 60秒冷却时间
-            
-            # 更新时间戳
-            os.utime(config_file, None)
-            logger.info(f"已更新配置文件 {config_file} 的时间戳")
-            
-            # 5秒后重置触发标记
-            def reset_trigger():
-                time.sleep(5)
-                app_state.rebuild_triggered = False
+                    # 构建下一页URL
+                    next_api_url = f'{api_path}&page={page}'
+                    if use_proxy and USE_PROXY:
+                        next_url = f'{GITHUB_PROXY}?url=https://api.github.com/{next_api_url}'
+                    else:
+                        next_url = f'https://api.github.com/{next_api_url}'
+                    
+                    next_response = requests.get(next_url, headers=headers, timeout=30)
+                    next_response.raise_for_status()
+                    next_data = next_response.json()
+                    
+                    if not next_data:
+                        break
+                        
+                    all_data.extend(next_data)
+                    page += 1
                 
-            threading.Thread(target=reset_trigger, daemon=True).start()
-            return True
-        else:
-            logger.error(f"未找到MkDocs配置文件: {config_file}")
-            return False
-    except Exception as e:
-        logger.error(f"更新时间戳失败: {str(e)}")
-        return False
-
-def format_date(date_string):
-    """格式化日期"""
-    if not date_string:
-        return ""
-    try:
-        date_obj = datetime.strptime(date_string, "%Y-%m-%dT%H:%M:%SZ")
-        return date_obj.strftime("%Y-%m-%d %H:%M:%S")
-    except Exception:
-        return date_string
+                return all_data[:count], True
+            
+            return data, True
+            
+        except requests.exceptions.RequestException as e:
+            logger.error(f"API请求失败 (尝试 {attempt+1}/{MAX_RETRY_ATTEMPTS}): {str(e)}")
+            
+            # 如果代理失败，尝试直接访问
+            if use_proxy and USE_PROXY and attempt == 0:
+                logger.info("代理请求失败，尝试直接访问")
+                return fetch_github_data(repo, data_type, count, False)
+            
+            # 等待后重试
+            time.sleep(5)
+            
+    logger.error(f"在{MAX_RETRY_ATTEMPTS}次尝试后获取数据失败")
+    return None, False
 
 def format_file_size(bytes):
     """格式化文件大小"""
@@ -185,21 +120,28 @@ def format_file_size(bytes):
         return f"{bytes/(1024*1024*1024):.2f} GB"
 
 def format_contributors_markdown(contributors_data):
-    """将贡献者数据格式化为Markdown内容 - 使用原始风格"""
+    """将贡献者数据格式化为Markdown内容 - 简化版"""
     if not contributors_data or len(contributors_data) == 0:
         return "暂无贡献者数据，请稍后再试。"
     
-    # 添加缓存状态信息
-    markdown_content = f'''!!! note "数据信息"
-    数据更新于: {datetime.now().strftime("%Y-%m-%d %H:%M:%S")} (每30分钟自动检查更新)
-
-'''
+    # 生成Markdown格式的贡献者列表
+    markdown = ""
     
-    # 为每个贡献者创建条目
+    # 添加数据更新信息
+    markdown += f'!!! note "数据信息"\n'
+    markdown += f'    数据更新于: {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}\n\n'
+    
+    # 为每个贡献者创建信息卡片
     for index, contributor in enumerate(contributors_data):
         username = contributor.get('login', '未知用户')
         avatar_url = contributor.get('avatar_url', '')
-        profile_url = contributor.get('html_url', '#')
+        # 替换头像URL为代理URL
+        if USE_PROXY and 'githubusercontent.com' in avatar_url:
+            avatar_url = f'{GITHUB_PROXY}?url={avatar_url}'
+        profile_url = contributor.get('html_url', '')
+        # 替换个人主页URL为代理URL
+        if USE_PROXY and 'github.com' in profile_url:
+            profile_url = f'{GITHUB_PROXY}?url={profile_url}'
         contributions = contributor.get('contributions', 0)
         
         # 获取前三名的特殊样式
@@ -216,22 +158,22 @@ def format_contributors_markdown(contributors_data):
             medal_label = '<span class="medal-rank rank-3">3</span>'
         
         # 三级标题 + 简要介绍
-        markdown_content += f'### {username}\n\n'
-        markdown_content += f'<div class="contributor-simple {medal_class}">\n'
-        markdown_content += f'  <div class="avatar-container">\n'
-        markdown_content += f'    <img src="{avatar_url}" alt="{username}" class="contributor-avatar" />\n'
+        markdown += f'### {username}\n\n'
+        markdown += f'<div class="contributor-simple {medal_class}">\n'
+        markdown += f'  <div class="avatar-container">\n'
+        markdown += f'    <img src="{avatar_url}" alt="{username}" class="contributor-avatar" />\n'
         if medal_label:
-            markdown_content += f'    {medal_label}\n'
-        markdown_content += f'  </div>\n'
-        markdown_content += f'  <div class="contributor-details">\n'
-        markdown_content += f'    <a href="{profile_url}" target="_blank">{username}</a>\n'
-        markdown_content += f'    <span class="contributor-stats">贡献次数: {contributions}</span>\n'
-        markdown_content += f'  </div>\n'
-        markdown_content += f'</div>\n\n'
-        markdown_content += '---\n\n'
+            markdown += f'    {medal_label}\n'
+        markdown += f'  </div>\n'
+        markdown += f'  <div class="contributor-details">\n'
+        markdown += f'    <a href="{profile_url}" target="_blank">{username}</a>\n'
+        markdown += f'    <span class="contributor-stats">贡献次数: {contributions}</span>\n'
+        markdown += f'  </div>\n'
+        markdown += f'</div>\n\n'
+        markdown += '---\n\n'
     
-    # 添加CSS样式
-    markdown_content += '''
+    # 添加简洁的CSS样式
+    markdown += '''
 <style>
 .contributor-simple {
     display: flex;
@@ -314,98 +256,74 @@ def format_contributors_markdown(contributors_data):
 </style>
 '''
     
-    return markdown_content
+    return markdown
 
 def format_releases_markdown(releases_data):
-    """将发布数据格式化为Markdown内容 - 使用原始风格"""
+    """将发布数据格式化为Markdown内容 - 简化版"""
     if not releases_data or len(releases_data) == 0:
         return "暂无版本数据，请稍后再试。"
     
-    markdown_content = "# 📝 更新日志\n\n"
+    markdown = "# 📝 更新日志\n\n"
+    markdown += "!!! warning \"更多版本\"\n"
+    markdown += f"    如需查看全部历史版本，请访问 [GitHub Releases 页面](https://github.com/{GITHUB_REPO}/releases)，本页面从该页面定时获取最新更新信息。\n\n"
     
-    # 添加缓存状态信息
-    markdown_content += f'!!! note "数据信息"\n'
-    markdown_content += f'    数据更新于: {datetime.now().strftime("%Y-%m-%d %H:%M:%S")} (每30分钟自动检查更新)\n\n'
+    # 添加数据更新信息
+    markdown += f'!!! note "数据信息"\n'
+    markdown += f'    数据更新于: {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}\n\n'
     
-    # 遍历发布版本
     for index, release in enumerate(releases_data):
-        # 获取发布信息
-        prerelease = release.get('prerelease', False)
-        tag_name = release.get('tag_name', '')
+        tag_name = release.get('tag_name', '未知版本')
         name = release.get('name') or tag_name
-        created_at = format_date(release.get('created_at', ''))
-        body = release.get('body', '')
+        published_at = release.get('published_at', '')
+        body = release.get('body', '无发布说明')
+        prerelease = release.get('prerelease', False)
         
-        # 处理内容中的图片链接
+        if published_at:
+            try:
+                # 转换ISO格式的时间为更友好的格式
+                pub_date = datetime.fromisoformat(published_at.replace('Z', '+00:00'))
+                formatted_date = pub_date.strftime('%Y-%m-%d %H:%M:%S')
+            except Exception:
+                formatted_date = published_at
+        else:
+            formatted_date = '未知时间'
+        
+        # 处理Markdown格式
+        body = body.replace('### ', '#### ').replace('## ', '### ')
+        
+        # 替换图片链接（如果使用代理）
         if USE_PROXY:
+            import re
             # 替换Markdown格式的图片链接
-            def replace_md_img(match):
-                alt_text = match.group(1)
-                img_url = match.group(2)
-                return f'![{alt_text}]({GITHUB_PROXY}?url={img_url})'
-            
-            body = re.sub(r'!\[(.*?)\]\((https?://[^)]+)\)', replace_md_img, body)
+            body = re.sub(r'!\[(.*?)\]\((https?://[^)]+)\)', 
+                          f'![\g<1>]({GITHUB_PROXY}?url=\\2)', 
+                          body)
             
             # 替换HTML格式的图片链接
-            def replace_html_img(match):
-                prefix = match.group(1)
-                img_url = match.group(2)
-                suffix = match.group(3)
-                return f'<img{prefix}src="{GITHUB_PROXY}?url={img_url}"{suffix}>'
-            
-            body = re.sub(r'<img([^>]*)src="(https?://[^"]+)"([^>]*)>', replace_html_img, body)
+            body = re.sub(r'<img([^>]*)src="(https?://[^"]+)"([^>]*)>', 
+                          f'<img\\1src="{GITHUB_PROXY}?url=\\2"\\3>', 
+                          body)
         
-        # 处理内容中的标题，确保所有标题至少是三级标题
-        # 首先移除原始内容中可能存在的HTML标签
-        body = re.sub(r'<[^>]+>', '', body)
+        markdown += f'## {name}\n\n'
         
-        # 预处理：统一处理Markdown标题格式
-        # 1. 移除每行开头和结尾的空白字符
-        body = re.sub(r'^\s+|\s+$', '', body, flags=re.MULTILINE)
-        
-        # 2. 确保标题前有空行（更好的分隔）
-        body = re.sub(r'([^\n])\n(#{1,6} )', r'\1\n\n\2', body)
-        
-        # 3. 处理标题：依次处理1级到6级标题
-        for i in range(1, 7):
-            heading = '#' * i
-            
-            # 改进的标题级别处理:
-            # - 一级标题变为三级标题
-            # - 其他标题只提升一级，但确保不超过最大级别
-            if i == 1:
-                new_level = 3  # 一级标题统一变为三级
-            else:
-                new_level = min(i + 1, 6)  # 其他标题提升一级，但不超过六级
-                
-            new_heading = '#' * new_level
-            
-            # 更强大的标题匹配模式，忽略行首空白，确保匹配标题后的空格和内容
-            pattern = r'(^|\n)[ \t]*' + re.escape(heading) + r'[ \t]+(.+?)[ \t]*(\n|$)'
-            replacement = r'\1' + new_heading + r' \2\3'
-            body = re.sub(pattern, replacement, body)
-        
-        # 版本号作为二级标题
-        markdown_content += f'## {tag_name}\n\n'
-        
-        # 最新版本直接显示"最新版本"，其他版本显示正式/预发布版本
+        # 版本类型标签
+        version_type = "预发布版本" if prerelease else "正式版本"
         if index == 0:
-            version_type = "最新版本"
+            version_type = f"最新{version_type}"
+            admonition_type = "success"
         else:
-            version_type = "预发布版本" if prerelease else "正式版本"
+            admonition_type = "info"
         
-        # 为最新版本使用不同颜色的admonition
-        admonition_type = "success" if index == 0 else "info"
-        markdown_content += f'???+ {admonition_type} "{version_type} · 发布于 {created_at}"\n\n'
+        markdown += f'???+ {admonition_type} "{version_type} · 发布于 {formatted_date}"\n\n'
         
         # 缩进内容以适应admonition格式
         indented_body = '\n'.join(['    ' + line for line in body.split('\n')])
-        markdown_content += f'{indented_body}\n\n'
+        markdown += f'{indented_body}\n\n'
         
-        # 添加资源下载部分（仍在admonition内部，但作为普通文本）
+        # 添加资源下载部分
         assets = release.get('assets', [])
         if assets or tag_name:
-            markdown_content += '    **下载资源**\n\n'
+            markdown += '    **下载资源**\n\n'
             # 添加正常资源
             for asset in assets:
                 name = asset.get('name', '')
@@ -414,31 +332,31 @@ def format_releases_markdown(releases_data):
                 if USE_PROXY and 'github.com' in url:
                     url = f'{GITHUB_PROXY}?url={url}'
                 size = format_file_size(asset.get('size', 0))
-                markdown_content += f'    - [{name}]({url}) ({size})\n'
+                markdown += f'    - [{name}]({url}) ({size})\n'
             
-            # 在下载资源部分直接添加源代码下载链接
+            # 添加源代码下载链接
             if tag_name:
                 # 构建zip下载链接
                 zip_url = f'https://github.com/{GITHUB_REPO}/archive/refs/tags/{tag_name}.zip'
                 if USE_PROXY:
                     proxy_zip_url = f'{GITHUB_PROXY}?url={zip_url}'
-                    markdown_content += f'    - [Source code (zip)]({proxy_zip_url})\n'
+                    markdown += f'    - [Source code (zip)]({proxy_zip_url})\n'
                 else:
-                    markdown_content += f'    - [Source code (zip)]({zip_url})\n'
+                    markdown += f'    - [Source code (zip)]({zip_url})\n'
                 
                 # 构建tar.gz下载链接
                 tar_url = f'https://github.com/{GITHUB_REPO}/archive/refs/tags/{tag_name}.tar.gz'
                 if USE_PROXY:
                     proxy_tar_url = f'{GITHUB_PROXY}?url={tar_url}'
-                    markdown_content += f'    - [Source code (tar.gz)]({proxy_tar_url})\n'
+                    markdown += f'    - [Source code (tar.gz)]({proxy_tar_url})\n'
                 else:
-                    markdown_content += f'    - [Source code (tar.gz)]({tar_url})\n'
+                    markdown += f'    - [Source code (tar.gz)]({tar_url})\n'
             
-            markdown_content += '\n'
+            markdown += '\n'
         
-        markdown_content += '---\n\n'
+        markdown += '---\n\n'
     
-    return markdown_content
+    return markdown
 
 def update_markdown_file(file_path, content):
     """更新Markdown文件内容"""
@@ -466,36 +384,22 @@ def update_special_thanks_file():
             return False
         
         # 格式化为Markdown
+        base_content = """# New API 的开发离不开社区的支持和贡献。在此特别感谢所有为项目提供帮助的个人和组织。
+
+## 👨‍💻 开发贡献者
+
+以下是所有为项目做出贡献的开发者列表。在此感谢他们的辛勤工作和创意！
+
+!!! info "贡献者信息"
+    以下贡献者数据从 [GitHub Contributors 页面](https://github.com/Calcium-Ion/new-api/graphs/contributors) 自动获取前50名。贡献度前三名分别以金、银、铜牌边框标识。如果您也想为项目做出贡献，欢迎提交 Pull Request。
+
+"""
         contributors_markdown = format_contributors_markdown(contributors_data)
+        full_content = base_content + contributors_markdown
         
-        # 读取原文件内容
+        # 更新文件
         thanks_file = os.path.join(DOCS_DIR, 'docs/wiki/special-thanks.md')
-        if os.path.exists(thanks_file):
-            with open(thanks_file, 'r', encoding='utf-8') as f:
-                thanks_content = f.read()
-            
-            # 找到需要替换的部分
-            pattern = r'(!!! note "数据信息".*?)(?=\n## |\Z)'
-            if re.search(pattern, thanks_content, re.DOTALL):
-                # 如果找到了数据信息部分，替换整个部分
-                new_content = re.sub(pattern, contributors_markdown, thanks_content, flags=re.DOTALL)
-                return update_markdown_file(thanks_file, new_content)
-            else:
-                # 如果找不到，先查找标题
-                title_match = re.search(r'^# (.*?)$', thanks_content, re.MULTILINE)
-                if title_match:
-                    # 保留标题，添加新内容
-                    title = title_match.group(0)
-                    new_content = f"{title}\n\n{contributors_markdown}"
-                    return update_markdown_file(thanks_file, new_content)
-                else:
-                    # 如果找不到标题，直接添加内容
-                    full_content = f"# New API 的开发离不开社区的支持和贡献。在此特别感谢所有为项目提供帮助的个人和组织。\n\n{contributors_markdown}"
-                    return update_markdown_file(thanks_file, full_content)
-        else:
-            # 如果文件不存在，创建包含完整内容的文件
-            full_content = f"# New API 的开发离不开社区的支持和贡献。在此特别感谢所有为项目提供帮助的个人和组织。\n\n{contributors_markdown}"
-            return update_markdown_file(thanks_file, full_content)
+        return update_markdown_file(thanks_file, full_content)
     
     except Exception as e:
         logger.error(f"更新贡献者列表失败: {str(e)}")
@@ -522,56 +426,59 @@ def update_changelog_file():
         return False
 
 def main():
-    """主函数"""
+    """主函数 - 智能更新文档"""
     logger.info("启动文档更新服务")
     
-    # 检查MkDocs配置文件
-    config_file = os.path.join(DOCS_DIR, 'mkdocs.yml')
-    if os.path.exists(config_file):
-        logger.info(f"找到MkDocs配置文件: {config_file}")
-    else:
-        logger.warning(f"未找到MkDocs配置文件: {config_file}")
+    # 初始化变量
+    last_update = {
+        'contributors': 0,
+        'releases': 0
+    }
     
-    # 设置初始更新时间
-    last_check = 0
+    # 设置更新间隔 (单位：秒)
+    update_intervals = {
+        'contributors': 3600,     # 贡献者列表每小时更新一次
+        'releases': 1800          # 发布日志每30分钟更新一次
+    }
     
     # 主循环
     while True:
         try:
             current_time = time.time()
             
-            # 检查是否需要更新
-            if current_time - last_check >= UPDATE_INTERVAL:
-                logger.info("开始检查更新")
-                last_check = current_time
-                
-                # 更新文件
-                changes_detected = False
-                
-                # 更新贡献者列表
+            # 检查是否需要更新贡献者列表
+            if current_time - last_update['contributors'] >= update_intervals['contributors']:
+                logger.info("开始更新贡献者列表")
                 if update_special_thanks_file():
-                    changes_detected = True
-                    logger.info("已更新贡献者列表")
-                
-                # 休眠5秒，避免连续请求
-                time.sleep(5)
-                
-                # 更新发布日志
-                if update_changelog_file():
-                    changes_detected = True
-                    logger.info("已更新更新日志")
-                
-                # 如果有变化，触发MkDocs重建
-                if changes_detected:
-                    logger.info("检测到变化，触发MkDocs重建")
-                    update_mkdocs_timestamp()
+                    last_update['contributors'] = current_time
+                    logger.info("贡献者列表更新成功")
                 else:
-                    logger.info("没有检测到变化，跳过触发重建")
+                    logger.warning("贡献者列表更新失败，将在下次更新周期重试")
             
-            # 休眠一段时间
-            sleep_time = 60  # 每分钟检查一次是否需要更新
-            logger.debug(f"休眠 {sleep_time} 秒")
-            time.sleep(sleep_time)
+            # 检查是否需要更新发布日志
+            if current_time - last_update['releases'] >= update_intervals['releases']:
+                logger.info("开始更新发布日志")
+                if update_changelog_file():
+                    last_update['releases'] = current_time
+                    logger.info("发布日志更新成功")
+                else:
+                    logger.warning("发布日志更新失败，将在下次更新周期重试")
+            
+            # 计算下一次检查前的等待时间
+            next_check = min(
+                last_update['contributors'] + update_intervals['contributors'],
+                last_update['releases'] + update_intervals['releases']
+            ) - current_time
+            
+            # 如果时间已经过了，立即再次检查
+            if next_check <= 0:
+                next_check = 10
+            
+            # 限制最小和最大等待时间
+            next_check = max(min(next_check, 600), 30)
+            
+            logger.info(f"下次检查将在 {next_check:.0f} 秒后进行")
+            time.sleep(next_check)
             
         except Exception as e:
             logger.error(f"更新循环出错: {str(e)}")
