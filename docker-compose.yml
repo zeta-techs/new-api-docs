@@ -27,8 +27,8 @@ services:
       - UPDATE_INTERVAL=1800  # 30分钟更新一次
       - GITHUB_REPO=Calcium-Ion/new-api
       - DOCS_DIR=/app/docs
-      - USE_PROXY=true
-      # - GITHUB_PROXY=https://api2.aimage.cc/proxy
+      # - USE_PROXY=true
+      - GITHUB_PROXY=https://api2.aimage.cc/proxy
       - TZ=Asia/Shanghai
     networks:
       - docs-network
