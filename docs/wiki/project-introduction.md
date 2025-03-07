@@ -3,7 +3,7 @@
 
   <strong style="font-size: 1.5em">New API</strong>
 
-  <img src="../assets/trendshift.svg" alt="NewAPI_Trendshift" style="width: 250px; height: 55px;" width="250" height="55"/>
+  <img src="/assets/trendshift.svg" alt="NewAPI_Trendshift" style="width: 250px; height: 55px;" width="250" height="55"/>
 
 </div>
 
