@@ -18,31 +18,9 @@ logger = logging.getLogger('docs-updater')
 # 环境变量配置
 UPDATE_INTERVAL = int(os.environ.get('UPDATE_INTERVAL', 1800))  # 默认30分钟
 GITHUB_REPO = os.environ.get('GITHUB_REPO', 'Calcium-Ion/new-api')
-CACHE_DIR = os.environ.get('CACHE_DIR', '/app/docs/.cache')
 GITHUB_PROXY = os.environ.get('GITHUB_PROXY', 'https://api2.aimage.cc/proxy')
 USE_PROXY = os.environ.get('USE_PROXY', 'true').lower() == 'true'
 DOCS_DIR = os.environ.get('DOCS_DIR', '/app/docs')
-
-# 确保缓存目录存在
-os.makedirs(CACHE_DIR, exist_ok=True)
-
-def get_cache_path(repo, data_type, count):
-    """获取缓存文件的路径"""
-    safe_repo_name = repo.replace("/", "_")
-    return os.path.join(CACHE_DIR, f"{safe_repo_name}_{data_type}_{count}.json")
-
-def get_data_hash(data):
-    """获取数据的哈希值"""
-    if isinstance(data, list):
-        hash_data = []
-        for item in data[:10]:  # 只使用前10个项目计算哈希
-            if isinstance(item, dict):
-                if 'tag_name' in item:
-                    hash_data.append(f"{item.get('tag_name')}_{item.get('created_at')}")
-                elif 'login' in item:
-                    hash_data.append(f"{item.get('login')}_{item.get('contributions')}")
-        return hashlib.md5(json.dumps(hash_data).encode()).hexdigest()
-    return hashlib.md5(json.dumps(data).encode()).hexdigest()
 
 def fetch_github_data(repo, data_type, count, use_proxy=True):
     """获取GitHub数据"""
@@ -112,46 +90,6 @@ def fetch_github_data(repo, data_type, count, use_proxy=True):
     except Exception as e:
         logger.error(f"获取数据时出错: {str(e)}")
         return None, False
-
-def update_cache(repo, data_type, count):
-    """更新缓存文件"""
-    cache_file = get_cache_path(repo, data_type, count)
-    cache_changed = False
-    
-    try:
-        # 获取新数据
-        new_data, success = fetch_github_data(repo, data_type, count)
-        if not success or not new_data:
-            logger.error(f"无法获取 {repo} 的 {data_type} 数据")
-            return False
-        
-        # 检查缓存是否存在
-        if os.path.exists(cache_file):
-            # 加载现有数据
-            with open(cache_file, 'r', encoding='utf-8') as f:
-                old_data = json.load(f)
-            
-            # 比较数据是否有变化
-            if get_data_hash(old_data) == get_data_hash(new_data):
-                logger.info(f"{repo} 的 {data_type} 数据没有变化，跳过更新")
-                return False
-            else:
-                logger.info(f"{repo} 的 {data_type} 数据有变化，更新缓存")
-                cache_changed = True
-        else:
-            logger.info(f"缓存文件不存在，创建 {repo} 的 {data_type} 缓存")
-            cache_changed = True
-        
-        # 更新缓存文件
-        with open(cache_file, 'w', encoding='utf-8') as f:
-            json.dump(new_data, f)
-        
-        logger.info(f"已更新 {repo} 的 {data_type} 缓存")
-        return cache_changed
-    
-    except Exception as e:
-        logger.error(f"更新缓存失败: {str(e)}")
-        return False
 
 def update_mkdocs_timestamp():
     """更新MkDocs配置文件时间戳，触发重建"""
@@ -329,136 +267,87 @@ def format_releases_markdown(releases_data):
     
     return markdown_content
 
-def update_markdown_file(file_path, content, tag_pattern=None):
+def update_markdown_file(file_path, content):
     """更新Markdown文件内容"""
     try:
-        original_content = ""
-        file_changed = True
+        # 确保目录存在
+        os.makedirs(os.path.dirname(file_path), exist_ok=True)
         
-        # 检查文件是否存在
-        if os.path.exists(file_path):
-            with open(file_path, 'r', encoding='utf-8') as f:
-                original_content = f.read()
-                
-            # 如果提供了标签模式，则只替换标签部分
-            if tag_pattern:
-                match = re.search(tag_pattern, original_content, re.DOTALL)
-                if match:
-                    # 只替换标签之间的内容
-                    new_content = original_content[:match.start()] + content + original_content[match.end():]
-                    
-                    # 检查内容是否实际更改
-                    if new_content == original_content:
-                        logger.info(f"文件 {file_path} 内容未更改，跳过写入")
-                        file_changed = False
-                    else:
-                        # 写入新内容
-                        with open(file_path, 'w', encoding='utf-8') as f:
-                            f.write(new_content)
-                        logger.info(f"已更新文件 {file_path} 的标签内容")
-                else:
-                    # 标签未找到，直接追加内容
-                    logger.warning(f"文件 {file_path} 中未找到匹配的标签，将追加内容")
-                    with open(file_path, 'w', encoding='utf-8') as f:
-                        f.write(original_content + "\n\n" + content)
-            else:
-                # 如果没有标签模式，直接覆盖整个文件
-                if original_content != content:
-                    with open(file_path, 'w', encoding='utf-8') as f:
-                        f.write(content)
-                    logger.info(f"已覆盖更新文件 {file_path}")
-                else:
-                    logger.info(f"文件 {file_path} 内容未更改，跳过写入")
-                    file_changed = False
-        else:
-            # 文件不存在，创建新文件
-            os.makedirs(os.path.dirname(file_path), exist_ok=True)
-            with open(file_path, 'w', encoding='utf-8') as f:
-                f.write(content)
-            logger.info(f"已创建文件 {file_path}")
+        # 写入文件
+        with open(file_path, 'w', encoding='utf-8') as f:
+            f.write(content)
         
-        return file_changed
+        logger.info(f"已更新文件 {file_path}")
+        return True
     except Exception as e:
         logger.error(f"更新Markdown文件失败: {str(e)}")
         return False
 
-def update_documents_with_github_data():
-    """使用缓存的GitHub数据更新文档"""
-    changes_detected = False
-    
-    # 更新发布日志
-    releases_cache = get_cache_path(GITHUB_REPO, "releases", 30)
-    if os.path.exists(releases_cache):
-        try:
-            with open(releases_cache, 'r', encoding='utf-8') as f:
-                releases_data = json.load(f)
+def update_special_thanks_file():
+    """更新特别感谢文件"""
+    try:
+        # 获取贡献者数据
+        contributors_data, success = fetch_github_data(GITHUB_REPO, "contributors", 50)
+        if not success or not contributors_data:
+            logger.error("无法获取贡献者数据")
+            return False
+        
+        # 格式化为Markdown
+        contributors_markdown = format_contributors_markdown(contributors_data)
+        
+        # 读取原文件内容
+        thanks_file = os.path.join(DOCS_DIR, 'docs/wiki/special-thanks.md')
+        if os.path.exists(thanks_file):
+            with open(thanks_file, 'r', encoding='utf-8') as f:
+                thanks_content = f.read()
             
-            # 格式化为Markdown
-            releases_markdown = format_releases_markdown(releases_data)
-            
-            # 更新到文件
-            changelog_file = os.path.join(DOCS_DIR, 'docs/wiki/changelog.md')
-            if update_markdown_file(changelog_file, releases_markdown):
-                changes_detected = True
-                logger.info("已更新更新日志")
-            
-        except Exception as e:
-            logger.error(f"更新更新日志失败: {str(e)}")
-    
-    # 更新贡献者列表
-    contributors_cache = get_cache_path(GITHUB_REPO, "contributors", 50)
-    if os.path.exists(contributors_cache):
-        try:
-            with open(contributors_cache, 'r', encoding='utf-8') as f:
-                contributors_data = json.load(f)
-            
-            # 格式化为Markdown
-            contributors_markdown = format_contributors_markdown(contributors_data)
-            
-            # 更新到文件
-            thanks_file = os.path.join(DOCS_DIR, 'docs/wiki/special-thanks.md')
-            if os.path.exists(thanks_file):
-                # 读取文件内容
-                with open(thanks_file, 'r', encoding='utf-8') as f:
-                    thanks_content = f.read()
+            # 找到需要替换的部分
+            sections = thanks_content.split("## 👨‍💻 开发贡献者")
+            if len(sections) > 1:
+                # 提取第一部分
+                first_part = sections[0].strip()
                 
-                # 找到需要替换的部分
-                sections = thanks_content.split("## 👨‍💻 开发贡献者")
-                if len(sections) > 1:
-                    # 提取第一部分
-                    first_part = sections[0].strip()
-                    
-                    # 拼接新内容
-                    new_content = f"{first_part}\n\n{contributors_markdown}"
-                    
-                    # 更新文件
-                    if update_markdown_file(thanks_file, new_content):
-                        changes_detected = True
-                        logger.info("已更新贡献者列表")
-                else:
-                    # 如果找不到分隔标记，直接添加内容
-                    update_markdown_file(thanks_file, contributors_markdown)
-                    changes_detected = True
-                    logger.info("已添加贡献者列表")
+                # 拼接新内容
+                new_content = f"{first_part}\n\n{contributors_markdown}"
+                
+                # 更新文件
+                return update_markdown_file(thanks_file, new_content)
             else:
-                # 如果文件不存在，创建包含完整内容的文件
+                # 如果找不到分隔标记，直接添加内容
                 full_content = f"# New API 的开发离不开社区的支持和贡献。在此特别感谢所有为项目提供帮助的个人和组织。\n\n{contributors_markdown}"
-                update_markdown_file(thanks_file, full_content)
-                changes_detected = True
-                logger.info("已创建贡献者列表文件")
-            
-        except Exception as e:
-            logger.error(f"更新贡献者列表失败: {str(e)}")
+                return update_markdown_file(thanks_file, full_content)
+        else:
+            # 如果文件不存在，创建包含完整内容的文件
+            full_content = f"# New API 的开发离不开社区的支持和贡献。在此特别感谢所有为项目提供帮助的个人和组织。\n\n{contributors_markdown}"
+            return update_markdown_file(thanks_file, full_content)
     
-    return changes_detected
+    except Exception as e:
+        logger.error(f"更新贡献者列表失败: {str(e)}")
+        return False
+
+def update_changelog_file():
+    """更新更新日志文件"""
+    try:
+        # 获取发布数据
+        releases_data, success = fetch_github_data(GITHUB_REPO, "releases", 30)
+        if not success or not releases_data:
+            logger.error("无法获取发布数据")
+            return False
+        
+        # 格式化为Markdown
+        releases_markdown = format_releases_markdown(releases_data)
+        
+        # 更新到文件
+        changelog_file = os.path.join(DOCS_DIR, 'docs/wiki/changelog.md')
+        return update_markdown_file(changelog_file, releases_markdown)
+    
+    except Exception as e:
+        logger.error(f"更新更新日志失败: {str(e)}")
+        return False
 
 def main():
     """主函数"""
     logger.info("启动文档更新服务")
-    
-    # 创建缓存目录
-    os.makedirs(CACHE_DIR, exist_ok=True)
-    logger.info(f"缓存目录: {CACHE_DIR}")
     
     # 检查MkDocs配置文件
     config_file = os.path.join(DOCS_DIR, 'mkdocs.yml')
@@ -480,26 +369,24 @@ def main():
                 logger.info("开始检查更新")
                 last_check = current_time
                 
-                # 需要更新的数据
-                update_tasks = [
-                    (GITHUB_REPO, "releases", 30),
-                    (GITHUB_REPO, "contributors", 50)
-                ]
+                # 更新文件
+                changes_detected = False
                 
-                cache_changes_detected = False
+                # 更新贡献者列表
+                if update_special_thanks_file():
+                    changes_detected = True
+                    logger.info("已更新贡献者列表")
                 
-                # 执行更新
-                for repo, data_type, count in update_tasks:
-                    cache_changed = update_cache(repo, data_type, count)
-                    if cache_changed:
-                        cache_changes_detected = True
-                    time.sleep(5)  # 避免连续请求
+                # 休眠5秒，避免连续请求
+                time.sleep(5)
                 
-                # 使用GitHub数据更新文档
-                doc_changes_detected = update_documents_with_github_data()
+                # 更新发布日志
+                if update_changelog_file():
+                    changes_detected = True
+                    logger.info("已更新更新日志")
                 
                 # 如果有变化，触发MkDocs重建
-                if cache_changes_detected or doc_changes_detected:
+                if changes_detected:
                     logger.info("检测到变化，触发MkDocs重建")
                     update_mkdocs_timestamp()
                 else:

@@ -1,3 +1,5 @@
+version: '3'
+
 services:
   # MkDocs主服务
   mkdocs:
@@ -26,7 +28,6 @@ services:
     environment:
       - UPDATE_INTERVAL=1800  # 30分钟更新一次
       - GITHUB_REPO=Calcium-Ion/new-api
-      - CACHE_DIR=/app/docs/.cache
       - DOCS_DIR=/app/docs
       - USE_PROXY=true
       - GITHUB_PROXY=https://api2.aimage.cc/proxy
