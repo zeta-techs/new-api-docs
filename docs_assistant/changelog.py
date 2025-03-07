@@ -17,8 +17,8 @@ def format_releases_markdown(releases_data):
     # 获取当前时间
     current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     
-    markdown += "!!! warning \"版本日志信息（数据更新于: {current_time}）\"\n"
-    markdown += f"    如需查看全部历史版本，请访问 [GitHub Releases 页面](https://github.com/{GITHUB_REPO}/releases)，本页面从该页面定时获取最新更新信息。\n"
+    markdown += f"!!! warning \"版本日志信息（数据更新于: {current_time}）\"\n"
+    markdown += f"    如需查看全部历史版本，请访问 [GitHub Releases 页面](https://github.com/{GITHUB_REPO}/releases)，本页面从该页面定时获取最新更新信息。\n\n"
     
     for index, release in enumerate(releases_data):
         tag_name = release.get('tag_name', '未知版本')
