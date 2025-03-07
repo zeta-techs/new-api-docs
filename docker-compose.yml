@@ -13,6 +13,12 @@ services:
       - TZ=Asia/Shanghai
     networks:
       - docs-network
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "--quiet", "http://localhost:8000"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
 
   # 辅助更新服务
   docs-updater:
@@ -33,7 +39,8 @@ services:
     networks:
       - docs-network
     depends_on:
-      - mkdocs
+      mkdocs:
+        condition: service_healthy
 
 networks:
   docs-network:
