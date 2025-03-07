@@ -7,6 +7,7 @@ import logging
 from datetime import datetime
 import yaml
 import re
+import threading
 
 # 配置日志
 logging.basicConfig(
@@ -22,6 +23,16 @@ GITHUB_PROXY = os.environ.get('GITHUB_PROXY', 'https://api2.aimage.cc/proxy')
 USE_PROXY = os.environ.get('USE_PROXY', 'true').lower() == 'true'
 DOCS_DIR = os.environ.get('DOCS_DIR', '/app/docs')
 
+# 全局状态
+class AppState:
+    def __init__(self):
+        self.api_failures = 0  # API失败计数
+        self.api_cooldown_until = 0  # API冷却时间
+        self.rebuild_cooldown = 0  # 重建冷却时间
+        self.rebuild_triggered = False  # 标记是否已触发重建
+        
+app_state = AppState()
+
 def fetch_github_data(repo, data_type, count, use_proxy=True):
     """获取GitHub数据"""
     logger.info(f"获取GitHub数据: {repo}, {data_type}, count={count}")
@@ -29,6 +40,13 @@ def fetch_github_data(repo, data_type, count, use_proxy=True):
     headers = {'User-Agent': 'Mozilla/5.0 DocUpdater/1.0'}
     
     try:
+        # 检查API冷却时间
+        current_time = time.time()
+        if current_time < app_state.api_cooldown_until:
+            cooldown_remaining = int(app_state.api_cooldown_until - current_time)
+            logger.info(f"GitHub API冷却中，跳过请求 (剩余 {cooldown_remaining} 秒)")
+            return None, False
+            
         # 构建API路径
         if data_type == "releases":
             api_path = f'repos/{repo}/releases?per_page={count}'
@@ -48,6 +66,9 @@ def fetch_github_data(repo, data_type, count, use_proxy=True):
         response = requests.get(api_url, headers=headers, timeout=30)
         response.raise_for_status()
         data = response.json()
+        
+        # 成功获取数据，重置失败计数
+        app_state.api_failures = 0
         
         # 处理分页 (如果需要)
         if data_type == "contributors" and len(data) < count and len(data) > 0:
@@ -81,6 +102,13 @@ def fetch_github_data(repo, data_type, count, use_proxy=True):
     except requests.exceptions.RequestException as e:
         logger.error(f"API请求失败: {str(e)}")
         
+        # 处理限速错误
+        if hasattr(e, 'response') and e.response and e.response.status_code == 403 and "rate limit exceeded" in str(e.response.text).lower():
+            app_state.api_failures += 1
+            cooldown_time = 60 * (2 ** min(app_state.api_failures, 6))  # 指数退避，最多64分钟
+            app_state.api_cooldown_until = time.time() + cooldown_time
+            logger.warning(f"GitHub API限速，设置冷却时间 {cooldown_time} 秒")
+        
         # 如果代理失败，尝试直接访问
         if use_proxy and USE_PROXY:
             logger.info("代理请求失败，尝试直接访问")
@@ -89,17 +117,44 @@ def fetch_github_data(repo, data_type, count, use_proxy=True):
         return None, False
     except Exception as e:
         logger.error(f"获取数据时出错: {str(e)}")
+        
+        # 增加失败计数和冷却时间
+        app_state.api_failures += 1
+        cooldown_time = 30 * app_state.api_failures  # 线性增加冷却时间
+        app_state.api_cooldown_until = time.time() + cooldown_time
+        logger.warning(f"设置API冷却时间 {cooldown_time} 秒")
+        
         return None, False
 
 def update_mkdocs_timestamp():
     """更新MkDocs配置文件时间戳，触发重建"""
+    current_time = time.time()
+    if current_time < app_state.rebuild_cooldown:
+        logger.info(f"重建冷却中，跳过触发 (剩余 {int(app_state.rebuild_cooldown - current_time)} 秒)")
+        return False
+        
+    if app_state.rebuild_triggered:
+        logger.info("已经触发过重建，跳过")
+        return False
+        
     try:
         # 查找MkDocs配置文件
         config_file = os.path.join(DOCS_DIR, 'mkdocs.yml')
         if os.path.exists(config_file):
+            # 设置重建标记和冷却时间
+            app_state.rebuild_triggered = True
+            app_state.rebuild_cooldown = current_time + 60  # 60秒冷却时间
+            
             # 更新时间戳
             os.utime(config_file, None)
             logger.info(f"已更新配置文件 {config_file} 的时间戳")
+            
+            # 5秒后重置触发标记
+            def reset_trigger():
+                time.sleep(5)
+                app_state.rebuild_triggered = False
+                
+            threading.Thread(target=reset_trigger, daemon=True).start()
             return True
         else:
             logger.error(f"未找到MkDocs配置文件: {config_file}")
@@ -108,162 +163,280 @@ def update_mkdocs_timestamp():
         logger.error(f"更新时间戳失败: {str(e)}")
         return False
 
+def format_date(date_string):
+    """格式化日期"""
+    if not date_string:
+        return ""
+    try:
+        date_obj = datetime.strptime(date_string, "%Y-%m-%dT%H:%M:%SZ")
+        return date_obj.strftime("%Y-%m-%d %H:%M:%S")
+    except Exception:
+        return date_string
+
+def format_file_size(bytes):
+    """格式化文件大小"""
+    if bytes < 1024:
+        return f"{bytes} B"
+    elif bytes < 1024 * 1024:
+        return f"{bytes/1024:.2f} KB"
+    elif bytes < 1024 * 1024 * 1024:
+        return f"{bytes/(1024*1024):.2f} MB"
+    else:
+        return f"{bytes/(1024*1024*1024):.2f} GB"
+
 def format_contributors_markdown(contributors_data):
-    """将贡献者数据格式化为Markdown内容"""
+    """将贡献者数据格式化为Markdown内容 - 使用原始风格"""
     if not contributors_data or len(contributors_data) == 0:
         return "暂无贡献者数据，请稍后再试。"
     
-    # 生成贡献者卡片的HTML
-    cards_html = '<div class="contributor-cards">\n'
-    
-    for idx, contributor in enumerate(contributors_data):
-        login = contributor.get('login', '未知用户')
-        avatar_url = contributor.get('avatar_url', '')
-        html_url = contributor.get('html_url', '#')
-        contributions = contributor.get('contributions', 0)
-        
-        # 根据排名添加不同的边框样式
-        border_class = ""
-        if idx == 0:
-            border_class = "gold-border"  # 金牌
-        elif idx == 1:
-            border_class = "silver-border"  # 银牌
-        elif idx == 2:
-            border_class = "bronze-border"  # 铜牌
-        
-        cards_html += f'''
-<div class="contributor-card {border_class}">
-  <div class="contributor-avatar">
-    <a href="{html_url}" target="_blank">
-      <img src="{avatar_url}" alt="{login}">
-    </a>
-  </div>
-  <div class="contributor-info">
-    <div class="contributor-name"><a href="{html_url}" target="_blank">{login}</a></div>
-    <div class="contributor-contributions">贡献: {contributions}</div>
-  </div>
-</div>
+    # 添加缓存状态信息
+    markdown_content = f'''!!! note "数据信息"
+    数据更新于: {datetime.now().strftime("%Y-%m-%d %H:%M:%S")} (每30分钟自动检查更新)
+
 '''
     
-    cards_html += '</div>\n'
+    # 为每个贡献者创建条目
+    for index, contributor in enumerate(contributors_data):
+        username = contributor.get('login', '未知用户')
+        avatar_url = contributor.get('avatar_url', '')
+        profile_url = contributor.get('html_url', '#')
+        contributions = contributor.get('contributions', 0)
+        
+        # 获取前三名的特殊样式
+        medal_class = ""
+        medal_label = ""
+        if index == 0:
+            medal_class = "gold-medal"
+            medal_label = '<span class="medal-rank rank-1">1</span>'
+        elif index == 1:
+            medal_class = "silver-medal"
+            medal_label = '<span class="medal-rank rank-2">2</span>'
+        elif index == 2:
+            medal_class = "bronze-medal"
+            medal_label = '<span class="medal-rank rank-3">3</span>'
+        
+        # 三级标题 + 简要介绍
+        markdown_content += f'### {username}\n\n'
+        markdown_content += f'<div class="contributor-simple {medal_class}">\n'
+        markdown_content += f'  <div class="avatar-container">\n'
+        markdown_content += f'    <img src="{avatar_url}" alt="{username}" class="contributor-avatar" />\n'
+        if medal_label:
+            markdown_content += f'    {medal_label}\n'
+        markdown_content += f'  </div>\n'
+        markdown_content += f'  <div class="contributor-details">\n'
+        markdown_content += f'    <a href="{profile_url}" target="_blank">{username}</a>\n'
+        markdown_content += f'    <span class="contributor-stats">贡献次数: {contributions}</span>\n'
+        markdown_content += f'  </div>\n'
+        markdown_content += f'</div>\n\n'
+        markdown_content += '---\n\n'
     
     # 添加CSS样式
-    css_style = '''
+    markdown_content += '''
 <style>
-.contributor-cards {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 15px;
-  justify-content: center;
-  margin: 20px 0;
+.contributor-simple {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
 }
 
-.contributor-card {
-  width: 130px;
-  background-color: #f5f5f5;
-  border-radius: 8px;
-  padding: 10px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  transition: transform 0.2s;
-}
-
-.contributor-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 5px 10px rgba(0,0,0,0.15);
-}
-
-.gold-border {
-  border: 2px solid gold;
-}
-
-.silver-border {
-  border: 2px solid silver;
-}
-
-.bronze-border {
-  border: 2px solid #cd7f32;
+.avatar-container {
+    position: relative;
+    margin-right: 15px;
 }
 
 .contributor-avatar {
-  margin-bottom: 10px;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
 }
 
-.contributor-avatar img {
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  object-fit: cover;
+.medal-rank {
+    position: absolute;
+    bottom: -5px;
+    right: -5px;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 12px;
+    color: white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
 
-.contributor-info {
-  text-align: center;
+.rank-1 {
+    background-color: #ffd700;
 }
 
-.contributor-name {
-  font-weight: bold;
-  margin-bottom: 5px;
+.rank-2 {
+    background-color: #c0c0c0;
 }
 
-.contributor-contributions {
-  font-size: 0.9em;
-  color: #555;
+.rank-3 {
+    background-color: #cd7f32;
+}
+
+.gold-medal .contributor-avatar {
+    border: 4px solid #ffd700;
+    box-shadow: 0 0 10px #ffd700;
+}
+
+.silver-medal .contributor-avatar {
+    border: 4px solid #c0c0c0;
+    box-shadow: 0 0 10px #c0c0c0;
+}
+
+.bronze-medal .contributor-avatar {
+    border: 4px solid #cd7f32;
+    box-shadow: 0 0 10px #cd7f32;
+}
+
+.contributor-details {
+    display: flex;
+    flex-direction: column;
+}
+
+.contributor-details a {
+    font-weight: 500;
+    text-decoration: none;
+}
+
+.contributor-stats {
+    font-size: 0.9rem;
+    color: #666;
+}
+
+[data-md-color-scheme="slate"] .contributor-stats {
+    color: #aaa;
 }
 </style>
-'''
-    
-    # 生成最终的Markdown内容
-    markdown_content = f'''## 👨‍💻 开发贡献者
-
-以下是所有为项目做出贡献的开发者列表。在此感谢他们的辛勤工作和创意！
-
-!!! info "贡献者信息"
-    以下贡献者数据从 [GitHub Contributors 页面](https://github.com/{GITHUB_REPO}/graphs/contributors) 自动获取前{len(contributors_data)}名。贡献度前三名分别以金、银、铜牌边框标识。如果您也想为项目做出贡献，欢迎提交 Pull Request。
-
-{css_style}
-{cards_html}
-
-> 最后更新时间: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
 '''
     
     return markdown_content
 
 def format_releases_markdown(releases_data):
-    """将发布数据格式化为Markdown内容"""
+    """将发布数据格式化为Markdown内容 - 使用原始风格"""
     if not releases_data or len(releases_data) == 0:
         return "暂无版本数据，请稍后再试。"
     
     markdown_content = "# 📝 更新日志\n\n"
-    markdown_content += "!!! warning \"更多版本\"\n"
-    markdown_content += f"    如需查看全部历史版本，请访问 [GitHub Releases 页面](https://github.com/{GITHUB_REPO}/releases)，本页面从该页面定时获取最新更新信息。\n\n"
     
-    for release in releases_data:
-        tag_name = release.get('tag_name', '未知版本')
+    # 添加缓存状态信息
+    markdown_content += f'!!! note "数据信息"\n'
+    markdown_content += f'    数据更新于: {datetime.now().strftime("%Y-%m-%d %H:%M:%S")} (每30分钟自动检查更新)\n\n'
+    
+    # 遍历发布版本
+    for index, release in enumerate(releases_data):
+        # 获取发布信息
+        prerelease = release.get('prerelease', False)
+        tag_name = release.get('tag_name', '')
         name = release.get('name') or tag_name
-        published_at = release.get('published_at', '')
-        body = release.get('body', '无发布说明')
+        created_at = format_date(release.get('created_at', ''))
+        body = release.get('body', '')
         
-        if published_at:
-            try:
-                # 转换ISO格式的时间为更友好的格式
-                pub_date = datetime.fromisoformat(published_at.replace('Z', '+00:00'))
-                formatted_date = pub_date.strftime('%Y-%m-%d %H:%M:%S')
-            except Exception:
-                formatted_date = published_at
+        # 处理内容中的图片链接
+        if USE_PROXY:
+            # 替换Markdown格式的图片链接
+            def replace_md_img(match):
+                alt_text = match.group(1)
+                img_url = match.group(2)
+                return f'![{alt_text}]({GITHUB_PROXY}?url={img_url})'
+            
+            body = re.sub(r'!\[(.*?)\]\((https?://[^)]+)\)', replace_md_img, body)
+            
+            # 替换HTML格式的图片链接
+            def replace_html_img(match):
+                prefix = match.group(1)
+                img_url = match.group(2)
+                suffix = match.group(3)
+                return f'<img{prefix}src="{GITHUB_PROXY}?url={img_url}"{suffix}>'
+            
+            body = re.sub(r'<img([^>]*)src="(https?://[^"]+)"([^>]*)>', replace_html_img, body)
+        
+        # 处理内容中的标题，确保所有标题至少是三级标题
+        # 首先移除原始内容中可能存在的HTML标签
+        body = re.sub(r'<[^>]+>', '', body)
+        
+        # 预处理：统一处理Markdown标题格式
+        # 1. 移除每行开头和结尾的空白字符
+        body = re.sub(r'^\s+|\s+$', '', body, flags=re.MULTILINE)
+        
+        # 2. 确保标题前有空行（更好的分隔）
+        body = re.sub(r'([^\n])\n(#{1,6} )', r'\1\n\n\2', body)
+        
+        # 3. 处理标题：依次处理1级到6级标题
+        for i in range(1, 7):
+            heading = '#' * i
+            
+            # 改进的标题级别处理:
+            # - 一级标题变为三级标题
+            # - 其他标题只提升一级，但确保不超过最大级别
+            if i == 1:
+                new_level = 3  # 一级标题统一变为三级
+            else:
+                new_level = min(i + 1, 6)  # 其他标题提升一级，但不超过六级
+                
+            new_heading = '#' * new_level
+            
+            # 更强大的标题匹配模式，忽略行首空白，确保匹配标题后的空格和内容
+            pattern = r'(^|\n)[ \t]*' + re.escape(heading) + r'[ \t]+(.+?)[ \t]*(\n|$)'
+            replacement = r'\1' + new_heading + r' \2\3'
+            body = re.sub(pattern, replacement, body)
+        
+        # 版本号作为二级标题
+        markdown_content += f'## {tag_name}\n\n'
+        
+        # 最新版本直接显示"最新版本"，其他版本显示正式/预发布版本
+        if index == 0:
+            version_type = "最新版本"
         else:
-            formatted_date = '未知时间'
+            version_type = "预发布版本" if prerelease else "正式版本"
         
-        # 处理Markdown格式
-        body = body.replace('### ', '#### ').replace('## ', '### ')
+        # 为最新版本使用不同颜色的admonition
+        admonition_type = "success" if index == 0 else "info"
+        markdown_content += f'???+ {admonition_type} "{version_type} · 发布于 {created_at}"\n\n'
         
-        markdown_content += f"## {name}\n\n"
-        markdown_content += f"发布日期: {formatted_date}\n\n"
-        markdown_content += f"{body}\n\n"
-        markdown_content += "---\n\n"
-    
-    markdown_content += f"> 最后更新时间: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n"
+        # 缩进内容以适应admonition格式
+        indented_body = '\n'.join(['    ' + line for line in body.split('\n')])
+        markdown_content += f'{indented_body}\n\n'
+        
+        # 添加资源下载部分（仍在admonition内部，但作为普通文本）
+        assets = release.get('assets', [])
+        if assets or tag_name:
+            markdown_content += '    **下载资源**\n\n'
+            # 添加正常资源
+            for asset in assets:
+                name = asset.get('name', '')
+                url = asset.get('browser_download_url', '')
+                # 替换下载URL为代理URL
+                if USE_PROXY and 'github.com' in url:
+                    url = f'{GITHUB_PROXY}?url={url}'
+                size = format_file_size(asset.get('size', 0))
+                markdown_content += f'    - [{name}]({url}) ({size})\n'
+            
+            # 在下载资源部分直接添加源代码下载链接
+            if tag_name:
+                # 构建zip下载链接
+                zip_url = f'https://github.com/{GITHUB_REPO}/archive/refs/tags/{tag_name}.zip'
+                if USE_PROXY:
+                    proxy_zip_url = f'{GITHUB_PROXY}?url={zip_url}'
+                    markdown_content += f'    - [Source code (zip)]({proxy_zip_url})\n'
+                else:
+                    markdown_content += f'    - [Source code (zip)]({zip_url})\n'
+                
+                # 构建tar.gz下载链接
+                tar_url = f'https://github.com/{GITHUB_REPO}/archive/refs/tags/{tag_name}.tar.gz'
+                if USE_PROXY:
+                    proxy_tar_url = f'{GITHUB_PROXY}?url={tar_url}'
+                    markdown_content += f'    - [Source code (tar.gz)]({proxy_tar_url})\n'
+                else:
+                    markdown_content += f'    - [Source code (tar.gz)]({tar_url})\n'
+            
+            markdown_content += '\n'
+        
+        markdown_content += '---\n\n'
     
     return markdown_content
 
@@ -302,20 +475,23 @@ def update_special_thanks_file():
                 thanks_content = f.read()
             
             # 找到需要替换的部分
-            sections = thanks_content.split("## 👨‍💻 开发贡献者")
-            if len(sections) > 1:
-                # 提取第一部分
-                first_part = sections[0].strip()
-                
-                # 拼接新内容
-                new_content = f"{first_part}\n\n{contributors_markdown}"
-                
-                # 更新文件
+            pattern = r'(!!! note "数据信息".*?)(?=\n## |\Z)'
+            if re.search(pattern, thanks_content, re.DOTALL):
+                # 如果找到了数据信息部分，替换整个部分
+                new_content = re.sub(pattern, contributors_markdown, thanks_content, flags=re.DOTALL)
                 return update_markdown_file(thanks_file, new_content)
             else:
-                # 如果找不到分隔标记，直接添加内容
-                full_content = f"# New API 的开发离不开社区的支持和贡献。在此特别感谢所有为项目提供帮助的个人和组织。\n\n{contributors_markdown}"
-                return update_markdown_file(thanks_file, full_content)
+                # 如果找不到，先查找标题
+                title_match = re.search(r'^# (.*?)$', thanks_content, re.MULTILINE)
+                if title_match:
+                    # 保留标题，添加新内容
+                    title = title_match.group(0)
+                    new_content = f"{title}\n\n{contributors_markdown}"
+                    return update_markdown_file(thanks_file, new_content)
+                else:
+                    # 如果找不到标题，直接添加内容
+                    full_content = f"# New API 的开发离不开社区的支持和贡献。在此特别感谢所有为项目提供帮助的个人和组织。\n\n{contributors_markdown}"
+                    return update_markdown_file(thanks_file, full_content)
         else:
             # 如果文件不存在，创建包含完整内容的文件
             full_content = f"# New API 的开发离不开社区的支持和贡献。在此特别感谢所有为项目提供帮助的个人和组织。\n\n{contributors_markdown}"
