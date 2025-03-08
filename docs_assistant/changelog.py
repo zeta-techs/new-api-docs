@@ -1,7 +1,7 @@
 import os
 import re
 import logging
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
 from github_api import fetch_github_data, GITHUB_REPO, GITHUB_PROXY, USE_PROXY
 from utils import update_markdown_file, format_file_size, DOCS_DIR
 
@@ -31,7 +31,9 @@ def format_releases_markdown(releases_data):
             try:
                 # 转换ISO格式的时间为更友好的格式
                 pub_date = datetime.fromisoformat(published_at.replace('Z', '+00:00'))
-                formatted_date = pub_date.strftime('%Y-%m-%d %H:%M:%S')
+                # 转换为中国时间 (UTC+8)
+                china_date = pub_date.replace(tzinfo=timezone.utc).astimezone(timezone(timedelta(hours=8)))
+                formatted_date = f"{china_date.strftime('%Y-%m-%d %H:%M:%S')} (中国时间)"
             except Exception:
                 formatted_date = published_at
         else:
