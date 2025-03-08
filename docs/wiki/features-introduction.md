@@ -1,3 +1,5 @@
+# ✨ 特性说明
+
 1. 🎨 全新的UI界面（部分界面还待更新）
 2. 🌍 多语言支持（待完善）
 3. 🎨 添加[Midjourney-Proxy(Plus)](https://github.com/novicezk/midjourney-proxy)接口支持
