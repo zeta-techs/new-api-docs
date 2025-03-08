@@ -63,6 +63,7 @@ nav:
   - 首页: index.md
   - 开始使用: getting-started.md
   - 维基百科:
+    - 📖 维基百科: wiki/index.md
     - 📖 项目介绍: wiki/project-introduction.md
     - ✨ 特性说明: wiki/features-introduction.md
     - 🏗️ 技术架构: wiki/technical-architecture.md

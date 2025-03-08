@@ -303,7 +303,7 @@ hide:
     
     了解项目介绍、特性说明、技术架构和路线图
     
-    [了解更多 →](wiki/project-introduction.md){ .more-link }
+    [了解更多 →](wiki/index.md){ .more-link }
 
 -   :fontawesome-solid-user:{ .twemoji } 
     
