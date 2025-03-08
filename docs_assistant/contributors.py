@@ -385,7 +385,7 @@ New API 的开发离不开社区的支持和贡献。在此特别感谢所有为
 
 以下是所有为项目提供资金支持的赞助商。感谢他们的慷慨捐助，让项目能够持续发展！
 
-!!! info "赞助商信息 · 数据更新于 {current_time}"
+!!! info "赞助商信息 · 数据更新于 {current_time} (中国时间)"
     以下赞助商数据从爱发电平台自动获取。根据累计赞助金额，分为金牌、银牌和铜牌三个等级。
     如果您也想为项目提供资金支持，欢迎前往 [爱发电](https://afdian.com/a/new-api) 平台进行捐赠。
 
@@ -399,7 +399,7 @@ New API 的开发离不开社区的支持和贡献。在此特别感谢所有为
 
 以下是所有为项目做出贡献的开发者列表。在此感谢他们的辛勤工作和创意！
 
-!!! info "贡献者信息 · 数据更新于 {current_time}"
+!!! info "贡献者信息 · 数据更新于 {current_time} (中国时间)"
     以下贡献者数据从 [GitHub Contributors 页面](https://github.com/Calcium-Ion/new-api/graphs/contributors) 自动获取前50名。贡献度前三名分别以金、银、铜牌边框标识。如果您也想为项目做出贡献，欢迎提交 Pull Request。
 
 {format_contributors_markdown(contributors_data)}
