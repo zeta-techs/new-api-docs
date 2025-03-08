@@ -5,7 +5,7 @@ import logging
 
 # 环境变量配置
 GITHUB_REPO = os.environ.get('GITHUB_REPO', 'Calcium-Ion/new-api')
-GITHUB_PROXY = os.environ.get('GITHUB_PROXY', 'https://api2.aimage.cc/proxy')
+GITHUB_PROXY = os.environ.get('GITHUB_PROXY', 'https://p.aass.cc/proxy')
 USE_PROXY = os.environ.get('USE_PROXY', 'true').lower() == 'true'
 
 # GitHub API限制相关参数
