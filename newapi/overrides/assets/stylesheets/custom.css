@@ -799,6 +799,22 @@
     margin-bottom: 0.5rem;
 }
 
+.beian-info {
+    margin-bottom: 0.5rem;
+    font-size: 0.85rem;
+}
+
+.beian-info a {
+    color: #a5b4fc;
+    text-decoration: none;
+    transition: color 0.2s ease;
+    font-weight: 500;
+}
+
+.beian-info a:hover {
+    color: #818cf8;
+}
+
 .powered-by {
     font-size: 0.85rem;
 }
