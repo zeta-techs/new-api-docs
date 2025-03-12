@@ -12,7 +12,7 @@
 ### 基础重排序请求 ✅
 
 ```bash
-curl https://newapi地址/v2/rerank \
+curl https://newapi地址/v1/rerank \
   -H "Authorization: Bearer $NEWAPI_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -63,7 +63,7 @@ curl https://newapi地址/v2/rerank \
 ### 使用结构化数据 ✅
 
 ```bash
-curl https://newapi地址/v2/rerank \
+curl https://newapi地址/v1/rerank \
   -H "Authorization: Bearer $NEWAPI_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -113,7 +113,7 @@ curl https://newapi地址/v2/rerank \
 ### 端点
 
 ```
-POST /v2/rerank
+POST /v1/rerank
 ```
 
 根据与查询的相关性对文本列表进行重新排序。
