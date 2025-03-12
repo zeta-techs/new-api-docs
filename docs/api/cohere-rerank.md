@@ -1,5 +1,8 @@
 # Cohere 重排序格式（Rerank）
 
+!!! warning "重要提示"
+    cohere 的 Rerank 模型接口和 [Jina的Rerank模型接口格式](jinaai-rerank.md) 是一样的。
+
 !!! info "官方文档"
     [Cohere Rerank](https://docs.cohere.com/reference/rerank)
 
