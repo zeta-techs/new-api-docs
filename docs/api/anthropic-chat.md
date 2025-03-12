@@ -1,5 +1,8 @@
 # Anthropic 对话格式（Messages）
 
+!!! warning "支持的版本"
+    该格式仅 [new-api-horizon 版本](https://github.com/Calcium-Ion/new-api-horizon) 支持
+
 !!! info "官方文档"
     - [Anthropic Messages](https://docs.anthropic.com/en/api/messages)
     - [Anthropic Streaming Messages](https://docs.anthropic.com/en/api/messages-streaming)

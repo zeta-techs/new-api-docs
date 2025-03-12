@@ -99,6 +99,11 @@ hide:
     background: linear-gradient(135deg, #654ea3 0%, #8862cf 100%);
   }
   
+  /* 本地开发部署卡片 */
+  .md-typeset .grid.cards:nth-of-type(1) > ul > li:nth-child(5) {
+    background: linear-gradient(135deg, #1e6e42 0%, #28a745 100%);
+  }
+  
   /* 文档卡片颜色设置 */
   /* 维基百科卡片 */
   .md-typeset .grid.cards:nth-of-type(2) > ul > li:nth-child(1) {
@@ -288,6 +293,16 @@ hide:
     多节点分布式部署，实现高可用、负载均衡和水平扩展，适合大规模应用和企业级场景
     
     [了解更多 →](installation/cluster-deployment.md){ .more-link }
+
+-   :material-code-braces:{ .twemoji } 
+    
+    **本地开发部署**
+    
+    ---
+    
+    适合开发者进行代码贡献和二次开发，提供完整的本地开发环境设置指南
+    
+    [了解更多 →](installation/local-development.md){ .more-link }
 
 </div>
 

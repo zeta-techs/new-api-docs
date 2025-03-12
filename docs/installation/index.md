@@ -133,6 +133,16 @@ hide:
     
     [查看教程 →](cluster-deployment.md)
 
+-   :material-code-braces:{ .twemoji }
+
+    **本地开发部署**
+
+    ---
+
+    适合开发者和贡献者：
+    
+    [查看教程 →](local-development.md)
+
 </div>
 
 ## ⚙️ 配置与维护
