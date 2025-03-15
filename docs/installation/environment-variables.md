@@ -104,7 +104,9 @@
 
 !!! tip "Tiktoken文件配置"
     下载tiktoken文件后，请按照以下方式重命名：
+
     - `cl100k_base.tiktoken` 重命名为 `9b5ad71b2ce5302211f9c61530b329a4922fc6a4`
+    
     - `o200k_base.tiktoken` 重命名为 `fb374d419588a4632f3f557e76b4b70aebbca790`
     
     这些文件应放置在`TIKTOKEN_CACHE_DIR`指定的目录中，以提高token计算性能并减少网络依赖。
