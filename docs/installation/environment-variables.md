@@ -99,16 +99,27 @@
 | `GET_MEDIA_TOKEN_NOT_STREAM` | 非流模式下是否统计图片token | `true` | `GET_MEDIA_TOKEN_NOT_STREAM=false` |
 | `UPDATE_TASK` | 是否更新异步任务(MJ、Suno) | `true` | `UPDATE_TASK=false` |
 | `ENFORCE_INCLUDE_USAGE` | 强制stream模式下返回usage | `false` | `ENFORCE_INCLUDE_USAGE=true` |
-| `TIKTOKEN_CACHE_DIR` | Tiktoken编码器缓存目录 | - | `TIKTOKEN_CACHE_DIR=/cache/tiktoken` |
-
-!!! note "Tiktoken缓存文件说明"
-    在配置 `TIKTOKEN_CACHE_DIR` 后，需要将下载的编码器文件按以下规则重命名：
-    - `cl100k_base.tiktoken` 重命名为 `9b5ad71b2ce5302211f9c61530b329a4922fc6a4`
-    - `p50k_base.tiktoken` 重命名为 `fb374d419588a4632f3f557e76b4b70aebbca790`
-
-    这些文件用于本地缓存 tiktoken 编码器，可以提高系统性能并减少网络请求。
-
+| `TIKTOKEN_CACHE_DIR` | Tiktoken编码器缓存目录，用于存放分词文件避免网络下载 | - | `TIKTOKEN_CACHE_DIR=/cache/tiktoken` |
 | `DATA_GYM_CACHE_DIR` | DataGym缓存目录 | - | `DATA_GYM_CACHE_DIR=/cache/data_gym` |
+
+!!! tip "Tiktoken文件配置"
+    下载tiktoken文件后，请按照以下方式重命名：
+    - `cl100k_base.tiktoken` 重命名为 `9b5ad71b2ce5302211f9c61530b329a4922fc6a4`
+    - `o200k_base.tiktoken` 重命名为 `fb374d419588a4632f3f557e76b4b70aebbca790`
+    
+    这些文件应放置在`TIKTOKEN_CACHE_DIR`指定的目录中，以提高token计算性能并减少网络依赖。
+
+!!! example "Tiktoken配置示例"
+    ```bash
+    # Docker环境示例
+    TIKTOKEN_CACHE_DIR=/app/data/tiktoken
+    
+    # 然后将tiktoken文件下载并重命名后放入该目录：
+    /app/data/tiktoken/9b5ad71b2ce5302211f9c61530b329a4922fc6a4
+    /app/data/tiktoken/fb374d419588a4632f3f557e76b4b70aebbca790
+    ```
+    
+    Tiktoken是OpenAI使用的分词器，用于计算文本的token数量。通过本地缓存这些文件，可以避免系统每次启动时从网络下载，提高稳定性和性能，特别是在网络受限环境中。
 
 ## 🔎 特定模型配置
 
