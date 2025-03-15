@@ -100,6 +100,14 @@
 | `UPDATE_TASK` | 是否更新异步任务(MJ、Suno) | `true` | `UPDATE_TASK=false` |
 | `ENFORCE_INCLUDE_USAGE` | 强制stream模式下返回usage | `false` | `ENFORCE_INCLUDE_USAGE=true` |
 | `TIKTOKEN_CACHE_DIR` | Tiktoken编码器缓存目录 | - | `TIKTOKEN_CACHE_DIR=/cache/tiktoken` |
+
+!!! note "Tiktoken缓存文件说明"
+    在配置 `TIKTOKEN_CACHE_DIR` 后，需要将下载的编码器文件按以下规则重命名：
+    - `cl100k_base.tiktoken` 重命名为 `9b5ad71b2ce5302211f9c61530b329a4922fc6a4`
+    - `p50k_base.tiktoken` 重命名为 `fb374d419588a4632f3f557e76b4b70aebbca790`
+
+    这些文件用于本地缓存 tiktoken 编码器，可以提高系统性能并减少网络请求。
+
 | `DATA_GYM_CACHE_DIR` | DataGym缓存目录 | - | `DATA_GYM_CACHE_DIR=/cache/data_gym` |
 
 ## 🔎 特定模型配置
