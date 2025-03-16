@@ -131,7 +131,7 @@ nav:
       - 🔄 重排序（Rerank）:
         - Jina AI 格式: api/jinaai-rerank.md
         - Cohere 格式: api/cohere-rerank.md
-        - Xinference: api/xinference-rerank.md
+        - Xinference 格式: api/xinference-rerank.md
       - ⚡ 实时对话（Realtime）:
         - OpenAI 格式: api/openai-realtime.md
       - 🖼️ 图像（Image）:
