@@ -83,12 +83,12 @@
 | `METRIC_SUCCESS_RATE_THRESHOLD` | 请求成功率阈值 | `0.8` | `METRIC_SUCCESS_RATE_THRESHOLD=0.7` |
 | `TEST_PROMPT` | 测试模型时的用户prompt | `Print your model name exactly...` | `TEST_PROMPT=Hello` |
 
-## 🔄 代理配置
+<!-- ## 🔄 代理配置
 
 | 环境变量 | 说明 | 默认值 | 示例 |
 |---------|------|-------|------|
 | `RELAY_PROXY` | 中继请求使用的代理 | - | `RELAY_PROXY=http://127.0.0.1:7890` |
-| `USER_CONTENT_REQUEST_PROXY` | 用户内容请求使用的代理 | - | `USER_CONTENT_REQUEST_PROXY=http://127.0.0.1:7890` |
+| `USER_CONTENT_REQUEST_PROXY` | 用户内容请求使用的代理 | - | `USER_CONTENT_REQUEST_PROXY=http://127.0.0.1:7890` | -->
 
 ## 🤖 模型和请求处理配置
 
