@@ -135,6 +135,7 @@ hide:
     
     [Jina AI Rerank →](jinaai-rerank.md)
     [Cohere Rerank →](cohere-rerank.md)
+    [Xinference Rerank →](xinference-rerank.md)
 
 -   :material-lightning-bolt:{ .twemoji }
 
