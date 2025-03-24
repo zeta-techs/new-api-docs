@@ -71,6 +71,12 @@
 | `STREAMING_TIMEOUT` | 流式一次回复的超时时间(秒) | `60` | `STREAMING_TIMEOUT=120` |
 | `MAX_FILE_DOWNLOAD_MB` | 最大文件下载大小(MB) | `20` | `MAX_FILE_DOWNLOAD_MB=50` |
 
+!!! warning "RELAY_TIMEOUT 设置警告"
+    设置 `RELAY_TIMEOUT` 环境变量时请谨慎，如果设置过短可能导致以下问题：
+    - 上游API已经完成请求并计费，但本地因超时而未完成计费
+    - 造成计费不同步，可能导致系统亏损
+    - 建议不设置，除非您知道自己在做什么
+
 ## 📡 渠道管理配置
 
 | 环境变量 | 说明 | 默认值 | 示例 |
