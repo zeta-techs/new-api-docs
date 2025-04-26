@@ -155,7 +155,7 @@ hide:
 
     AI 图像生成服务：
     
-    [OpenAI DALL·E →](openai-image.md)
+    [OpenAI Image →](openai-image.md)
     [Midjourney Proxy →](midjourney-proxy-image.md)
 
 -   :material-volume-high:{ .twemoji }
