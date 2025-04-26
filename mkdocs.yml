@@ -135,7 +135,7 @@ nav:
       - ⚡ 实时对话（Realtime）:
         - OpenAI 格式: api/openai-realtime.md
       - 🖼️ 图像（Image）:
-        - OpenAI 格式（Dall·E）: api/openai-image.md
+        - OpenAI 格式（Image）: api/openai-image.md
         - Midjourney 格式（Midjourney Proxy/Midjourney Proxy Plus）: api/midjourney-proxy-image.md
       - 🔊 音频（Audio）:
         - OpenAI 格式: api/openai-audio.md
