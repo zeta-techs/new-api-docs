@@ -26,7 +26,7 @@ Suno Music API 提供了一系列音乐生成和处理的功能，包括:
 ### 生成歌曲 ✅
 
 ```bash
-curl --location 'https://newapi地址/suno/submit/music' \
+curl --location 'https://你的newapi服务器地址/suno/submit/music' \
 --header 'Authorization: Bearer $NEWAPI_API_KEY' \
 --header 'Content-Type: application/json' \
 --data '{
@@ -50,7 +50,7 @@ curl --location 'https://newapi地址/suno/submit/music' \
 ### 生成歌词 ✅
 
 ```bash
-curl --location 'https://newapi地址/suno/submit/lyrics' \
+curl --location 'https://你的newapi服务器地址/suno/submit/lyrics' \
 --header 'Authorization: Bearer $NEWAPI_API_KEY' \
 --header 'Content-Type: application/json' \
 --data '{
@@ -71,7 +71,7 @@ curl --location 'https://newapi地址/suno/submit/lyrics' \
 ### 上传音频 ❌
 
 ```bash
-curl --location 'https://newapi地址/suno/uploads/audio-url' \
+curl --location 'https://你的newapi服务器地址/suno/uploads/audio-url' \
 --header 'Authorization: Bearer $NEWAPI_API_KEY' \  
 --header 'Content-Type: application/json' \
 --data '{ 
@@ -92,7 +92,7 @@ curl --location 'https://newapi地址/suno/uploads/audio-url' \
 ### 歌曲拼接 ❌
 
 ```bash
-curl --location 'https://newapi地址/suno/submit/concat' \
+curl --location 'https://你的newapi服务器地址/suno/submit/concat' \
 --header 'Authorization: Bearer $NEWAPI_API_KEY' \
 --header 'Content-Type: application/json' \  
 --data '{
@@ -116,7 +116,7 @@ curl --location 'https://newapi地址/suno/submit/concat' \
 #### 批量查询
 
 ```bash
-curl --location 'https://newapi地址/suno/fetch' \
+curl --location 'https://你的newapi服务器地址/suno/fetch' \
 --header 'Authorization: Bearer $NEWAPI_API_KEY' \ 
 --header 'Content-Type: application/json' \
 --data '{
@@ -172,7 +172,7 @@ curl --location 'https://newapi地址/suno/fetch' \
 #### 单个查询
 
 ```bash
-curl --location 'https://newapi地址/suno/fetch/{{task_id}}' \ 
+curl --location 'https://你的newapi服务器地址/suno/fetch/{{task_id}}' \ 
 --header 'Authorization: Bearer $NEWAPI_API_KEY'
 ```
 

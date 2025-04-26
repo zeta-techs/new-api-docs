@@ -13,7 +13,7 @@
 
 ```bash
 # 基础图片生成
-curl https://newapi地址/v1/images/generations \
+curl https://你的newapi服务器地址/v1/images/generations \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $NEWAPI_API_KEY" \
   -d '{
@@ -24,7 +24,7 @@ curl https://newapi地址/v1/images/generations \
   }'
 
 # 高质量图片生成
-curl https://newapi地址/v1/images/generations \
+curl https://你的newapi服务器地址/v1/images/generations \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $NEWAPI_API_KEY" \
   -d '{
@@ -36,7 +36,7 @@ curl https://newapi地址/v1/images/generations \
   }'
 
 # 使用 base64 返回格式
-curl https://newapi地址/v1/images/generations \
+curl https://你的newapi服务器地址/v1/images/generations \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $NEWAPI_API_KEY" \
   -d '{
@@ -63,16 +63,28 @@ curl https://newapi地址/v1/images/generations \
 ### 编辑图片 ✅
 
 ```bash
-curl https://newapi地址/v1/images/edits \
+# dall-e-2 图片编辑
+curl https://你的newapi服务器地址/v1/images/edits \
   -H "Authorization: Bearer $NEWAPI_API_KEY" \
   -F image="@otter.png" \
   -F mask="@mask.png" \
   -F prompt="一只戴着贝雷帽的可爱小海獭" \
   -F n=2 \
   -F size="1024x1024"
+
+# gpt-image-1 多图片编辑示例
+curl https://你的newapi服务器地址/v1/images/edits \
+  -H "Authorization: Bearer $NEWAPI_API_KEY" \
+  -F "model=gpt-image-1" \
+  -F "image[]=@body-lotion.png" \
+  -F "image[]=@bath-bomb.png" \
+  -F "image[]=@incense-kit.png" \
+  -F "image[]=@soap.png" \
+  -F "prompt=创建一个包含这四个物品的精美礼品篮" \
+  -F "quality=high"
 ```
 
-**响应示例:**
+**响应示例 (dall-e-2):**
 
 ```json
 {
@@ -88,10 +100,32 @@ curl https://newapi地址/v1/images/edits \
 }
 ```
 
+**响应示例 (gpt-image-1):**
+
+```json
+{
+  "created": 1713833628,
+  "data": [
+    {
+      "b64_json": "..."
+    }
+  ],
+  "usage": {
+    "total_tokens": 100,
+    "input_tokens": 50,
+    "output_tokens": 50,
+    "input_tokens_details": {
+      "text_tokens": 10,
+      "image_tokens": 40
+    }
+  }
+}
+```
+
 ### 生成图片变体 ✅
 
 ```bash
-curl https://newapi地址/v1/images/variations \
+curl https://你的newapi服务器地址/v1/images/variations \
   -H "Authorization: Bearer $NEWAPI_API_KEY" \
   -F image="@otter.png" \
   -F n=2 \
@@ -130,7 +164,7 @@ POST /v1/images/generations
 POST /v1/images/edits
 ```
 
-根据原始图片和提示创建编辑或扩展的图片。
+根据一个或多个原始图片和提示创建编辑或扩展的图片。此端点支持 dall-e-2 和 gpt-image-1 模型。
 
 #### 生成变体
 ```
@@ -209,19 +243,46 @@ Authorization: Bearer $NEWAPI_API_KEY
 #### 编辑图片
 
 ##### `image`
-- 类型：文件
+- 类型：文件或文件数组
 - 必需：是
-- 说明：要编辑的图片。必须是有效的 PNG 文件，小于 4MB，且为正方形。如果未提供 mask，图片必须具有透明度，这将用作蒙版。
+- 说明：要编辑的图片。
+  - 对于 dall-e-2：必须是有效的 PNG 文件，小于 4MB，且为正方形。如果未提供 mask，图片必须具有透明度，这将用作蒙版。
+  - 对于 gpt-image-1：可以提供多个图片作为数组，每个图片应为 PNG、WEBP 或 JPG 文件，小于 25MB。
 
 ##### `prompt`
 - 类型：字符串
 - 必需：是
-- 说明：期望生成图片的文本描述。最大长度为 1000 字符。
+- 说明：期望生成图片的文本描述。
+  - dall-e-2 最大长度为 1000 字符
+  - gpt-image-1 最大长度为 32000 字符
 
 ##### `mask`
 - 类型：文件
 - 必需：否
-- 说明：额外的图片，其完全透明区域（如 alpha 为零的区域）指示应该编辑的位置。必须是有效的 PNG 文件，小于 4MB，且与 image 具有相同尺寸。
+- 说明：额外的图片，其完全透明区域（如 alpha 为零的区域）指示应该编辑的位置。如果提供了多个图片，mask 将应用于第一张图片。必须是有效的 PNG 文件，小于 4MB，且与 image 具有相同尺寸。
+
+##### `model`
+- 类型：字符串
+- 必需：否
+- 默认值：dall-e-2
+- 说明：用于图像生成的模型。支持 dall-e-2 和 gpt-image-1。除非使用了 gpt-image-1 特有的参数，否则默认为 dall-e-2。
+
+##### `quality`
+- 类型：字符串或 null
+- 必需：否
+- 默认值：auto
+- 说明：生成图片的质量。
+  - gpt-image-1 支持 high、medium 和 low
+  - dall-e-2 仅支持 standard
+  - 默认为 auto
+
+##### `size`
+- 类型：字符串或 null
+- 必需：否
+- 默认值：1024x1024
+- 说明：生成图片的尺寸。
+  - gpt-image-1 必须是 1024x1024、1536x1024（横版）、1024x1536（竖版）或 auto（默认）之一
+  - dall-e-2 必须是 256x256、512x512 或 1024x1024 之一
 
 其他参数与创建图片接口相同。
 
@@ -247,6 +308,14 @@ Authorization: Bearer $NEWAPI_API_KEY
 #### `data`
 - 类型：数组
 - 说明：生成的图片对象列表
+
+#### `usage`（仅适用于 gpt-image-1）
+- 类型：对象
+- 说明：API 调用的令牌使用情况
+  - `total_tokens`：使用的总令牌数
+  - `input_tokens`：输入使用的令牌数
+  - `output_tokens`：输出使用的令牌数
+  - `input_tokens_details`：输入令牌的详细信息（文本令牌和图像令牌）
 
 ### 图片对象
 

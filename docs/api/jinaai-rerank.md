@@ -15,7 +15,7 @@ Jina AI Rerank 是一个强大的文本重排序模型，可以根据查询对�
 ### 基础重排序请求 ✅
 
 ```bash
-curl https://newapi地址/v1/rerank \
+curl https://你的newapi服务器地址/v1/rerank \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $NEWAPI_API_KEY" \
   -d '{

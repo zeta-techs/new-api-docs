@@ -20,7 +20,7 @@
 ### 创建文本嵌入 ✅
 
 ```bash
-curl https://newapi地址/v1/embeddings \
+curl https://你的newapi服务器地址/v1/embeddings \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $NEWAPI_API_KEY" \
   -d '{
@@ -58,7 +58,7 @@ curl https://newapi地址/v1/embeddings \
 ### 批量创建嵌入 ✅
 
 ```bash
-curl https://newapi地址/v1/embeddings \
+curl https://你的newapi服务器地址/v1/embeddings \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $NEWAPI_API_KEY" \
   -d '{

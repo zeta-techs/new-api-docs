@@ -16,7 +16,7 @@ OpenAI 音频 API 提供了三个主要功能:
 ### 文本转语音 ✅
 
 ```bash
-curl https://newapi地址/v1/audio/speech \
+curl https://你的newapi服务器地址/v1/audio/speech \
   -H "Authorization: Bearer $NEWAPI_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -30,7 +30,7 @@ curl https://newapi地址/v1/audio/speech \
 ### 语音转文本 ✅
 
 ```bash
-curl https://newapi地址/v1/audio/transcriptions \
+curl https://你的newapi服务器地址/v1/audio/transcriptions \
   -H "Authorization: Bearer $NEWAPI_API_KEY" \
   -H "Content-Type: multipart/form-data" \
   -F file="@/path/to/file/audio.mp3" \
@@ -48,7 +48,7 @@ curl https://newapi地址/v1/audio/transcriptions \
 ### 音频翻译 ✅
 
 ```bash
-curl https://newapi地址/v1/audio/translations \
+curl https://你的newapi服务器地址/v1/audio/translations \
   -H "Authorization: Bearer $NEWAPI_API_KEY" \
   -H "Content-Type: multipart/form-data" \
   -F file="@/path/to/file/chinese.mp3" \

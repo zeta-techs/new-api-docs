@@ -13,7 +13,7 @@
 ### 基础文本对话 ✅
 
 ```bash
-curl https://newapi地址/v1/messages \
+curl https://你的newapi服务器地址/v1/messages \
      --header "anthropic-version: 2023-06-01" \
      --header "content-type: application/json" \
      --header "x-api-key: $NEWAPI_API_KEY" \
@@ -52,7 +52,7 @@ curl https://newapi地址/v1/messages \
 ### 图像分析对话 ✅
 
 ```bash
-curl https://newapi地址/v1/messages \
+curl https://你的newapi服务器地址/v1/messages \
      --header "anthropic-version: 2023-06-01" \
      --header "content-type: application/json" \
      --header "x-api-key: $NEWAPI_API_KEY" \
@@ -106,7 +106,7 @@ curl https://newapi地址/v1/messages \
 ### 工具调用 ✅
 
 ```bash
-curl https://newapi地址/v1/messages \
+curl https://你的newapi服务器地址/v1/messages \
      --header "anthropic-version: 2023-06-01" \
      --header "content-type: application/json" \
      --header "x-api-key: $NEWAPI_API_KEY" \
@@ -165,7 +165,7 @@ curl https://newapi地址/v1/messages \
 ### 流式响应 ✅
 
 ```bash
-curl https://newapi地址/v1/messages \
+curl https://你的newapi服务器地址/v1/messages \
      --header "anthropic-version: 2023-06-01" \
      --header "content-type: application/json" \
      --header "x-api-key: $NEWAPI_API_KEY" \

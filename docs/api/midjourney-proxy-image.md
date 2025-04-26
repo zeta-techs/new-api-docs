@@ -130,7 +130,7 @@ graph TD
 ### 提交Imagine任务 ✅
 
 ```bash
-curl --location --request POST 'https://newapi地址/mj/submit/imagine' \
+curl --location --request POST 'https://你的newapi服务器地址/mj/submit/imagine' \
 --header 'Authorization: Bearer $NEWAPI_API_KEY' \
 --header 'Accept: application/json' \
 --header 'Content-Type: application/json' \
@@ -165,7 +165,7 @@ curl --location --request POST 'https://newapi地址/mj/submit/imagine' \
 ### 提交Blend任务 ✅
 
 ```bash
-curl --location --request POST 'https://newapi地址/mj/submit/blend' \
+curl --location --request POST 'https://你的newapi服务器地址/mj/submit/blend' \
 --header 'Authorization: Bearer $NEWAPI_API_KEY' \
 --header 'Accept: application/json' \
 --header 'Content-Type: application/json' \
@@ -203,7 +203,7 @@ curl --location --request POST 'https://newapi地址/mj/submit/blend' \
 ### 提交Describe任务 ✅
 
 ```bash
-curl --location --request POST 'https://newapi地址/mj/submit/describe' \
+curl --location --request POST 'https://你的newapi服务器地址/mj/submit/describe' \
 --header 'Authorization: Bearer $NEWAPI_API_KEY' \
 --header 'Accept: application/json' \
 --header 'Content-Type: application/json' \
@@ -237,7 +237,7 @@ curl --location --request POST 'https://newapi地址/mj/submit/describe' \
 ### 提交Modal ✅
 
 ```bash
-curl --location --request POST 'https://newapi地址/mj/submit/modal' \
+curl --location --request POST 'https://你的newapi服务器地址/mj/submit/modal' \
 --header 'Authorization: Bearer $NEWAPI_API_KEY' \
 --header 'Accept: application/json' \
 --header 'Content-Type: application/json' \
@@ -262,7 +262,7 @@ curl --location --request POST 'https://newapi地址/mj/submit/modal' \
 ### 提交swap_face任务 ✅
 
 ```bash
-curl --location --request POST 'https://newapi地址/mj/insight-face/swap' \
+curl --location --request POST 'https://你的newapi服务器地址/mj/insight-face/swap' \
 --header 'Authorization: Bearer $NEWAPI_API_KEY' \
 --header 'Accept: application/json' \
 --header 'Content-Type: application/json' \
@@ -285,7 +285,7 @@ curl --location --request POST 'https://newapi地址/mj/insight-face/swap' \
 ### 执行Action动作 ✅
 
 ```bash
-curl --location --request POST 'https://newapi地址/mj/submit/action' \
+curl --location --request POST 'https://你的newapi服务器地址/mj/submit/action' \
 --header 'Authorization: Bearer $NEWAPI_API_KEY' \
 --header 'Accept: application/json' \
 --header 'Content-Type: application/json' \
@@ -320,7 +320,7 @@ curl --location --request POST 'https://newapi地址/mj/submit/action' \
 ### 上传文件到discord ✅
 
 ```bash
-curl --location --request POST 'https://newapi地址/mj/submit/upload-discord-images' \
+curl --location --request POST 'https://你的newapi服务器地址/mj/submit/upload-discord-images' \
 --header 'Authorization: Bearer $NEWAPI_API_KEY' \
 --header 'Accept: application/json' \
 --header 'Content-Type: application/json' \
@@ -349,7 +349,7 @@ curl --location --request POST 'https://newapi地址/mj/submit/upload-discord-im
 ### 根据ID列表查询任务 ✅
 
 ```bash
-curl --location --request POST 'https://newapi地址/mj/task/list-by-condition' \
+curl --location --request POST 'https://你的newapi服务器地址/mj/task/list-by-condition' \
 --header 'Accept: application/json' \
 --header 'Authorization: Bearer $NEWAPI_API_KEY' \
 --header 'Content-Type: application/json' \
@@ -393,7 +393,7 @@ curl --location --request POST 'https://newapi地址/mj/task/list-by-condition' 
 ### 指定ID获取任务 ✅
 
 ```bash
-curl --location --request GET 'https://newapi地址/mj/task/{id}/fetch' \
+curl --location --request GET 'https://你的newapi服务器地址/mj/task/{id}/fetch' \
 --header 'Accept: application/json' \
 --header 'Authorization: Bearer $NEWAPI_API_KEY' \
 --header 'Content-Type: application/json'
@@ -432,7 +432,7 @@ curl --location --request GET 'https://newapi地址/mj/task/{id}/fetch' \
 ### 获取任务图片的seed ✅
 
 ```bash
-curl --location --request GET 'https://newapi地址/mj/task/{id}/image-seed' \
+curl --location --request GET 'https://你的newapi服务器地址/mj/task/{id}/image-seed' \
 --header 'Accept: application/json' \
 --header 'Authorization: Bearer $NEWAPI_API_KEY' \
 --header 'Content-Type: application/json'

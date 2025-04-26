@@ -12,7 +12,7 @@
 ### 基础文本对话 ✅
 
 ```bash
-curl https://newapi地址/v1/chat/completions \
+curl https://你的newapi服务器地址/v1/chat/completions \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $NEWAPI_API_KEY" \
   -d '{
@@ -59,7 +59,7 @@ curl https://newapi地址/v1/chat/completions \
 ### 图像分析对话 ✅
 
 ```bash
-curl https://newapi地址/v1/chat/completions \
+curl https://你的newapi服务器地址/v1/chat/completions \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $NEWAPI_API_KEY" \
   -d '{
@@ -114,7 +114,7 @@ curl https://newapi地址/v1/chat/completions \
 ### 流式响应 ✅
 
 ```bash
-curl https://newapi地址/v1/chat/completions \
+curl https://你的newapi服务器地址/v1/chat/completions \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $NEWAPI_API_KEY" \
   -d '{
@@ -148,7 +148,7 @@ curl https://newapi地址/v1/chat/completions \
 ### 函数调用 ✅
 
 ```bash
-curl https://newapi地址/v1/chat/completions \
+curl https://你的newapi服务器地址/v1/chat/completions \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $NEWAPI_API_KEY" \
   -d '{
@@ -226,7 +226,7 @@ curl https://newapi地址/v1/chat/completions \
 ### JSON 模式输出 ✅
 
 ```bash
-curl https://newapi地址/v1/chat/completions \
+curl https://你的newapi服务器地址/v1/chat/completions \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $NEWAPI_API_KEY" \
   -d '{

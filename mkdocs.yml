@@ -1,11 +1,11 @@
 site_name: New API Docs
 site_url: https://docs.newapi.pro
-site_author: 量子智元
+site_author: QuantumNous
 site_description: 新一代大模型网关与AI资产管理系统
 
 # Repository
-repo_name: Calcium-Ion/new-api
-repo_url: https://github.com/Calcium-Ion/new-api
+repo_name: QuantumNous/new-api
+repo_url: https://github.com/QuantumNous/new-api
 
 theme:
   name: material
@@ -196,13 +196,13 @@ markdown_extensions:
       custom_checkbox: true
   - pymdownx.tilde
 
-# copyright: Copyright &copy; 2025 Quantum Nous. All Rights Reserved. 量子智元公司 版权所有
-copyright: Copyright &copy; 2025 New API. All Rights Reserved.
+copyright: Copyright &copy; 2025 Quantum Nous. All Rights Reserved.
+# copyright: Copyright &copy; 2025 New API. All Rights Reserved.
 
 extra:
   social:
     - icon: fontawesome/brands/github
-      link: https://github.com/Calcium-Ion/new-api
+      link: https://github.com/QuantumNous/new-api
     - icon: fontawesome/brands/docker
       link: https://hub.docker.com/r/calciumion/new-api
   analytics:

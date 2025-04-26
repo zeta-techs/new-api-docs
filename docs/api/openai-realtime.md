@@ -41,7 +41,7 @@ OpenAI Realtime API 提供两种连接方式：
 - 获取方式: 通过服务器端 API 创建
 
 ```http
-POST https://newapi地址/v1/realtime/sessions
+POST https://你的newapi服务器地址/v1/realtime/sessions
 Content-Type: application/json
 Authorization: Bearer $NEW_API_KEY
 
@@ -60,14 +60,14 @@ Authorization: Bearer $NEW_API_KEY
 ## 🔌 连接建立
 
 ### WebRTC 连接
-- URL: `https://newapi地址/v1/realtime`
+- URL: `https://你的newapi服务器地址/v1/realtime`
 - 查询参数: `model`
 - 请求头: 
   - `Authorization: Bearer EPHEMERAL_KEY`
   - `Content-Type: application/sdp`
 
 ### WebSocket 连接
-- URL: `wss://newapi地址/v1/realtime`
+- URL: `wss://你的newapi服务器地址/v1/realtime`
 - 查询参数: `model`
 - 请求头:
   - `Authorization: Bearer YOUR_API_KEY`
@@ -195,7 +195,7 @@ async function init() {
   const offer = await pc.createOffer();
   await pc.setLocalDescription(offer);
 
-  const baseUrl = "https://newapi地址/v1/realtime";
+  const baseUrl = "https://你的newapi服务器地址/v1/realtime";
   const model = "gpt-4o-realtime-preview-2024-12-17";
   const sdpResponse = await fetch(`${baseUrl}?model=${model}`, {
     method: "POST",
@@ -225,7 +225,7 @@ const app = express();
 // 创建一个端点用于生成临时令牌
 // 该端点与上面的客户端代码配合使用
 app.get("/session", async (req, res) => {
-  const r = await fetch("https://newapi地址/v1/realtime/sessions", {
+  const r = await fetch("https://你的newapi服务器地址/v1/realtime/sessions", {
     method: "POST",
     headers: {
       "Authorization": `Bearer ${process.env.NEW_API_KEY}`,
@@ -275,7 +275,7 @@ dc.send(JSON.stringify(responseCreate));
 ```javascript
 import WebSocket from "ws";
 
-const url = "wss://newapi地址/v1/realtime?model=gpt-4o-realtime-preview-2024-12-17";
+const url = "wss://你的newapi服务器地址/v1/realtime?model=gpt-4o-realtime-preview-2024-12-17";
 const ws = new WebSocket(url, {
   headers: {
     "Authorization": "Bearer " + process.env.NEW_API_KEY,
@@ -303,7 +303,7 @@ import websocket
 
 NEW_API_KEY = os.environ.get("NEW_API_KEY")
 
-url = "wss://newapi地址/v1/realtime?model=gpt-4o-realtime-preview-2024-12-17"
+url = "wss://你的newapi服务器地址/v1/realtime?model=gpt-4o-realtime-preview-2024-12-17"
 headers = [
     "Authorization: Bearer " + NEW_API_KEY,
     "OpenAI-Beta: realtime=v1"
@@ -335,7 +335,7 @@ ws.run_forever()
 */
 
 const ws = new WebSocket(
-  "wss://newapi地址/v1/realtime?model=gpt-4o-realtime-preview-2024-12-17",
+  "wss://你的newapi服务器地址/v1/realtime?model=gpt-4o-realtime-preview-2024-12-17",
   [
     "realtime",
     // 认证

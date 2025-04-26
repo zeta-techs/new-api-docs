@@ -14,7 +14,7 @@ Xinference的重排序API与Jina AI的重排序API完全兼容。请参考[Jina 
 ### 示例请求
 
 ```bash
-curl https://newapi地址/v1/rerank \
+curl https://你的newapi服务器地址/v1/rerank \
   -H "Authorization: Bearer $NEWAPI_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
