@@ -112,6 +112,7 @@ hide:
     支持多种主流聊天模型格式：
     
     [OpenAI Chat →](openai-chat.md)
+    [OpenAI Responses →](openai-responses.md)
     [Anthropic Chat →](anthropic-chat.md)
     [Deepseek Chat →](deepseek-reasoning-chat.md)
 
