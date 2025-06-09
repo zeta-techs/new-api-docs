@@ -115,6 +115,7 @@ hide:
     [OpenAI Responses →](openai-responses.md)
     [Anthropic Chat →](anthropic-chat.md)
     [Deepseek Chat →](deepseek-reasoning-chat.md)
+    [Google Chat →](google-gemini-chat.md)
 
 -   :material-alphabetical:{ .twemoji }
 

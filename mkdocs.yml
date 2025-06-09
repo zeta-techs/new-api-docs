@@ -124,9 +124,10 @@ nav:
     - 中继接口:
       - 💬 聊天（Chat）:
         - OpenAI 格式（Chat Completions）: api/openai-chat.md
-        - 🆕 OpenAI 格式（Responses）: api/openai-responses.md
+        - OpenAI 格式（Responses）: api/openai-responses.md
         - Anthropic 格式（Messages）: api/anthropic-chat.md
-        - Deepseek reasoning 格式（类Chat Completions）: api/deepseek-reasoning-chat.md
+        - Deepseek reasoning 格式（Reasoning Content）: api/deepseek-reasoning-chat.md
+        - 🆕 Google Gemini 格式（Generate Content）: api/google-gemini-chat.md
       - 🔤 嵌入（Embeddings）:
         - OpenAI 格式: api/openai-embedding.md
       - 🔄 重排序（Rerank）:

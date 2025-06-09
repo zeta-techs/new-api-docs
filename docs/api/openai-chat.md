@@ -14,7 +14,7 @@
 ```bash
 curl https://你的newapi服务器地址/v1/chat/completions \
   -H "Content-Type: application/json" \
-  -H "Authorization: Bearer $OPENAI_API_KEY" \
+  -H "Authorization: Bearer $NEWAPI_API_KEY" \
   -d '{
     "model": "gpt-4.1",
     "messages": [

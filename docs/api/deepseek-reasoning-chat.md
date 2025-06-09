@@ -1,4 +1,4 @@
-# Deepseek reasoning 对话格式（类Chat Completions）
+# Deepseek reasoning 对话格式（Reasoning Content）
 
 !!! info "官方文档"
     [推理模型 (deepseek-reasoner)](https://api-docs.deepseek.com/zh-cn/guides/reasoning_model)
