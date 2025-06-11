@@ -83,8 +83,8 @@ go build -o new-api
 
 # 更新并编译前端
 cd web
-yarn
-yarn build
+bun install
+bun run build
 cd ..
 
 # 重启服务
@@ -150,8 +150,8 @@ go build -o new-api
 
 # 更新并编译前端
 cd web
-yarn
-yarn build
+bun install
+bun run build
 cd ..
 
 # 重启服务

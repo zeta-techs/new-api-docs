@@ -8,10 +8,14 @@
 
 - **Go** 1.21 或更高版本（后端开发）
 - **Node.js** 18 或更高版本（前端开发）
+- **Bun** 最新版本（推荐的包管理器，比 npm/yarn 快 25 倍）
 - **Git**（版本控制）
 - **MySQL**（可选，默认使用 SQLite）
 - **Redis**（可选，用于提升性能）
 - **Visual Studio Code** 或其他代码编辑器
+
+!!! info "关于 Bun"
+    Bun是一个超快的JavaScript包管理器、测试运行器和bundler。相比传统的npm或yarn，Bun的安装速度快25倍，是2024年最推荐的JavaScript包管理工具。
 
 ## 🛠️ 克隆项目
 
@@ -66,17 +70,39 @@ go build -o new-api
 
 New API 的前端代码位于 `web` 目录中，使用 React 和 [semi design 组件库](https://semi.design/zh-CN) 开发。
 
+### 安装 Bun（推荐）
+
+如果还没有安装 Bun，请使用以下命令安装：
+
+**macOS/Linux:**
+```bash
+curl -fsSL https://bun.sh/install | bash
+```
+
+**Windows（使用 WSL）:**
+```bash
+curl -fsSL https://bun.sh/install | bash
+```
+
+**macOS（使用 Homebrew）:**
+```bash
+brew tap oven-sh/bun
+brew install bun
+```
+
+安装完成后，重启终端或运行 `source ~/.bashrc`（或 `~/.zshrc`）使 Bun 命令生效。
+
 ### 安装前端依赖
 
 ```bash
 cd web
-npm install   # 或者使用 yarn: yarn install
+bun install   # 使用 bun 安装前端依赖
 ```
 
 ### 运行开发服务器
 
 ```bash
-npm run dev   # 或者使用 yarn: yarn dev
+bun run dev   # 使用 bun 运行开发服务器
 ```
 
 前端开发服务器默认运行在 `http://localhost:5173`，并配置了代理，会将 API 请求转发到后端服务。
@@ -84,7 +110,7 @@ npm run dev   # 或者使用 yarn: yarn dev
 ### 构建前端资源
 
 ```bash
-npm run build   # 或者使用 yarn: yarn build
+bun run build   # 使用 bun 构建前端资源
 ```
 
 构建后的文件会生成到 `web/dist` 目录，后端服务会自动加载这些静态资源。
@@ -526,7 +552,7 @@ new-api/                                 # 项目根目录
     │  bun.lockb                         # Bun 包管理器锁文件
     │  index.html                        # 主 HTML 文件
     │  package.json                      # 前端依赖配置
-    │  pnpm-lock.yaml                    # PNPM 包管理器锁文件
+    │  bun.lockb                         # Bun 包管理器锁文件（二进制格式，更快）
     │  README.md                         # 前端说明文档
     │  vercel.json                       # Vercel 部署配置
     │  vite.config.js                    # Vite 构建配置
