@@ -141,171 +141,90 @@ curl "https://你的newapi服务器地址/v1beta/models/gemini-2.0-flash:generat
 }' 2> /dev/null | head
 ```
 
-### 音频处理 ❌
+### 音频处理 🟡
+
+!!! warning "文件上传限制"
+    仅支持通过 `inline_data` 以 base64 方式上传音频，不支持 `file_data.file_uri` 或 File API。
 
 ```bash
 # 使用File API上传音频数据到API请求
-MIME_TYPE=$(file -b --mime-type "${AUDIO_PATH}")
-NUM_BYTES=$(wc -c < "${AUDIO_PATH}")
-DISPLAY_NAME=AUDIO
-
-tmp_header_file=upload-header.tmp
-
-# 初始可恢复请求定义元数据
-# 上传URL在响应头中，将其转储到文件
-curl "${BASE_URL}/upload/v1beta/files?key=${NEWAPI_API_KEY}" \
-  -D upload-header.tmp \
-  -H "X-Goog-Upload-Protocol: resumable" \
-  -H "X-Goog-Upload-Command: start" \
-  -H "X-Goog-Upload-Header-Content-Length: ${NUM_BYTES}" \
-  -H "X-Goog-Upload-Header-Content-Type: ${MIME_TYPE}" \
-  -H "Content-Type: application/json" \
-  -d "{'file': {'display_name': '${DISPLAY_NAME}'}}" 2> /dev/null
-
-upload_url=$(grep -i "x-goog-upload-url: " "${tmp_header_file}" | cut -d" " -f2 | tr -d "\r")
-rm "${tmp_header_file}"
-
-# 上传实际字节
-curl "${upload_url}" \
-  -H "Content-Length: ${NUM_BYTES}" \
-  -H "X-Goog-Upload-Offset: 0" \
-  -H "X-Goog-Upload-Command: upload, finalize" \
-  --data-binary "@${AUDIO_PATH}" 2> /dev/null > file_info.json
-
-file_uri=$(jq ".file.uri" file_info.json)
-echo file_uri=$file_uri
+# 使用 base64 inline_data 上传音频数据到 API 请求
+if [[ "$(base64 --version 2>&1)" = *"FreeBSD"* ]]; then
+  B64FLAGS="--input"
+else
+  B64FLAGS="-w0"
+fi
+AUDIO_B64=$(base64 $B64FLAGS "$AUDIO_PATH")
 
 curl "https://你的newapi服务器地址/v1beta/models/gemini-2.0-flash:generateContent?key=$NEWAPI_API_KEY" \
-    -H 'Content-Type: application/json' \
-    -X POST \
-    -d '{
-      "contents": [{
-        "parts":[
-          {"text": "Please describe this file."},
-          {"file_data":{"mime_type": "audio/mpeg", "file_uri": '$file_uri'}}]
-        }]
-       }' 2> /dev/null > response.json
-
-cat response.json
-echo
-
-jq ".candidates[].content.parts[].text" response.json
+  -H 'Content-Type: application/json' \
+  -X POST \
+  -d '{
+    "contents": [{
+      "parts": [
+        {"text": "Please describe this audio file."},
+        {"inline_data": {"mime_type": "audio/mpeg", "data": "'$AUDIO_B64'"}}
+      ]
+    }]
+  }' 2> /dev/null | jq ".candidates[].content.parts[].text"
 ```
 
-### 视频处理 ❌
+### 视频处理 🟡
+
+!!! warning "文件上传限制"
+    仅支持通过 `inline_data` 以 base64 方式上传视频，不支持 `file_data.file_uri` 或 File API。
 
 ```bash
 # 使用File API上传视频数据到API请求
-MIME_TYPE=$(file -b --mime-type "${VIDEO_PATH}")
-NUM_BYTES=$(wc -c < "${VIDEO_PATH}")
-DISPLAY_NAME=VIDEO
-
-# 初始可恢复请求定义元数据
-# 上传URL在响应头中，将其转储到文件
-curl "${BASE_URL}/upload/v1beta/files?key=${NEWAPI_API_KEY}" \
-  -D "${tmp_header_file}" \
-  -H "X-Goog-Upload-Protocol: resumable" \
-  -H "X-Goog-Upload-Command: start" \
-  -H "X-Goog-Upload-Header-Content-Length: ${NUM_BYTES}" \
-  -H "X-Goog-Upload-Header-Content-Type: ${MIME_TYPE}" \
-  -H "Content-Type: application/json" \
-  -d "{'file': {'display_name': '${DISPLAY_NAME}'}}" 2> /dev/null
-
-upload_url=$(grep -i "x-goog-upload-url: " "${tmp_header_file}" | cut -d" " -f2 | tr -d "\r")
-rm "${tmp_header_file}"
-
-# 上传实际字节
-curl "${upload_url}" \
-  -H "Content-Length: ${NUM_BYTES}" \
-  -H "X-Goog-Upload-Offset: 0" \
-  -H "X-Goog-Upload-Command: upload, finalize" \
-  --data-binary "@${VIDEO_PATH}" 2> /dev/null > file_info.json
-
-file_uri=$(jq ".file.uri" file_info.json)
-echo file_uri=$file_uri
-
-state=$(jq ".file.state" file_info.json)
-echo state=$state
-
-name=$(jq ".file.name" file_info.json)
-echo name=$name
-
-while [[ "($state)" = *"PROCESSING"* ]];
-do
-  echo "Processing video..."
-  sleep 5
-  # 获取感兴趣的文件以检查状态
-  curl https://你的newapi服务器地址/v1beta/files/$name > file_info.json
-  state=$(jq ".file.state" file_info.json)
-done
+# 使用 base64 inline_data 上传视频数据到 API 请求
+if [[ "$(base64 --version 2>&1)" = *"FreeBSD"* ]]; then
+  B64FLAGS="--input"
+else
+  B64FLAGS="-w0"
+fi
+VIDEO_B64=$(base64 $B64FLAGS "$VIDEO_PATH")
 
 curl "https://你的newapi服务器地址/v1beta/models/gemini-2.0-flash:generateContent?key=$NEWAPI_API_KEY" \
-    -H 'Content-Type: application/json' \
-    -X POST \
-    -d '{
-      "contents": [{
-        "parts":[
-          {"text": "Transcribe the audio from this video, giving timestamps for salient events in the video. Also provide visual descriptions."},
-          {"file_data":{"mime_type": "video/mp4", "file_uri": '$file_uri'}}]
-        }]
-       }' 2> /dev/null > response.json
-
-cat response.json
-echo
-
-jq ".candidates[].content.parts[].text" response.json
+  -H 'Content-Type: application/json' \
+  -X POST \
+  -d '{
+    "contents": [{
+      "parts": [
+        {"text": "Transcribe the audio from this video and provide visual descriptions."},
+        {"inline_data": {"mime_type": "video/mp4", "data": "'$VIDEO_B64'"}}
+      ]
+    }]
+  }' 2> /dev/null | jq ".candidates[].content.parts[].text"
 ```
 
-### PDF处理 ❌
+### PDF处理 🟡
+
+!!! warning "文件上传限制"
+    仅支持通过 `inline_data` 以 base64 方式上传 PDF，不支持 `file_data.file_uri` 或 File API。
 
 ```bash
 MIME_TYPE=$(file -b --mime-type "${PDF_PATH}")
-NUM_BYTES=$(wc -c < "${PDF_PATH}")
-DISPLAY_NAME=TEXT
+# 使用 base64 inline_data 上传 PDF 文件到 API 请求
+if [[ "$(base64 --version 2>&1)" = *"FreeBSD"* ]]; then
+  B64FLAGS="--input"
+else
+  B64FLAGS="-w0"
+fi
+PDF_B64=$(base64 $B64FLAGS "$PDF_PATH")
 
 echo $MIME_TYPE
-tmp_header_file=upload-header.tmp
 
-# 初始可恢复请求定义元数据
-# 上传URL在响应头中，将其转储到文件
-curl "${BASE_URL}/upload/v1beta/files?key=${NEWAPI_API_KEY}" \
-  -D upload-header.tmp \
-  -H "X-Goog-Upload-Protocol: resumable" \
-  -H "X-Goog-Upload-Command: start" \
-  -H "X-Goog-Upload-Header-Content-Length: ${NUM_BYTES}" \
-  -H "X-Goog-Upload-Header-Content-Type: ${MIME_TYPE}" \
-  -H "Content-Type: application/json" \
-  -d "{'file': {'display_name': '${DISPLAY_NAME}'}}" 2> /dev/null
-
-upload_url=$(grep -i "x-goog-upload-url: " "${tmp_header_file}" | cut -d" " -f2 | tr -d "\r")
-rm "${tmp_header_file}"
-
-# 上传实际字节
-curl "${upload_url}" \
-  -H "Content-Length: ${NUM_BYTES}" \
-  -H "X-Goog-Upload-Offset: 0" \
-  -H "X-Goog-Upload-Command: upload, finalize" \
-  --data-binary "@${PDF_PATH}" 2> /dev/null > file_info.json
-
-file_uri=$(jq ".file.uri" file_info.json)
-echo file_uri=$file_uri
-
-# 现在使用该文件生成内容
 curl "https://你的newapi服务器地址/v1beta/models/gemini-2.0-flash:generateContent?key=$NEWAPI_API_KEY" \
-    -H 'Content-Type: application/json' \
-    -X POST \
-    -d '{
-      "contents": [{
-        "parts":[
-          {"text": "Can you add a few more lines to this poem?"},
-          {"file_data":{"mime_type": "application/pdf", "file_uri": '$file_uri'}}]
-        }]
-       }' 2> /dev/null > response.json
-
-cat response.json
-echo
-
-jq ".candidates[].content.parts[].text" response.json
+  -H 'Content-Type: application/json' \
+  -X POST \
+  -d '{
+    "contents": [{
+      "parts": [
+        {"text": "Can you add a few more lines to this poem?"},
+        {"inline_data": {"mime_type": "application/pdf", "data": "'$PDF_B64'"}}
+      ]
+    }]
+  }' 2> /dev/null | jq ".candidates[].content.parts[].text"
 ```
 
 ### 聊天对话 ✅
