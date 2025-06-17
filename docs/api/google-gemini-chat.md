@@ -141,7 +141,7 @@ curl "https://你的newapi服务器地址/v1beta/models/gemini-2.0-flash:generat
 }' 2> /dev/null | head
 ```
 
-### 音频处理 ✅
+### 音频处理 ❌
 
 ```bash
 # 使用File API上传音频数据到API请求
@@ -192,7 +192,7 @@ echo
 jq ".candidates[].content.parts[].text" response.json
 ```
 
-### 视频处理 ✅
+### 视频处理 ❌
 
 ```bash
 # 使用File API上传视频数据到API请求
@@ -256,7 +256,7 @@ echo
 jq ".candidates[].content.parts[].text" response.json
 ```
 
-### PDF处理 ✅
+### PDF处理 ❌
 
 ```bash
 MIME_TYPE=$(file -b --mime-type "${PDF_PATH}")
